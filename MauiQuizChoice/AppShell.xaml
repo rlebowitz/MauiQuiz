@@ -1,0 +1,11 @@
+<Shell
+    x:Class="MauiQuizChoice.AppShell"
+    xmlns:local="clr-namespace:MauiQuizChoice"
+    Title="MauiQuizChoice">
+
+    <ShellContent
+        Title="Home"
+        ContentTemplate="{DataTemplate local:QuizPage}"
+        Route="QuizPage" />
+
+</Shell>
