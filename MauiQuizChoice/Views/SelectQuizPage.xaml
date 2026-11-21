@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:MauiQuizChoice.ViewModels"
              xmlns:models="clr-namespace:MauiQuizChoice.Models"
              xmlns:controls="clr-namespace:MauiQuizChoice.Controls"
-             x:Class="MauiQuizChoice.QuizPage"
+             x:Class="MauiQuizChoice.Views.SelectQuizPage"
              x:DataType="vm:QuizViewModel"
              Shell.NavBarIsVisible="False"
              BackgroundColor="#F8F9FB">
