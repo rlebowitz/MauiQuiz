@@ -16,30 +16,30 @@ public partial class TrueFalseQuizViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(ProgressText))]
     [NotifyPropertyChangedFor(nameof(CanGoBack))]
     [NotifyCanExecuteChangedFor(nameof(PreviousCommand))]
-    private int _currentIndex;
+    public partial int CurrentIndex {get; set; }
 
     [ObservableProperty]
-    private TrueFalseQuestion _currentQuestion;
+    public partial TrueFalseQuestion CurrentQuestion { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(NextCommand))]
-    private bool _isNextEnabled;
+    public partial bool IsNextEnabled {get; set; }
 
     [ObservableProperty]
-    private bool _isAnalyzing;
+    public partial bool IsAnalyzing {get; set; }
 
     [ObservableProperty]
-    private bool _isSummaryVisible;
+    public partial bool IsSummaryVisible {get; set; }
 
     [ObservableProperty]
-    private string _scoreSummaryText = string.Empty;
+    public partial string ScoreSummaryText {get; set; } = string.Empty;
 
-    public ObservableCollection<TrueFalseReviewItem> ReviewResults { get; } = new();
+    public ObservableCollection<TrueFalseReviewItem> ReviewResults { get; } = [];
 
     public TrueFalseQuizViewModel()
     {
-        _questions = new List<TrueFalseQuestion>
-        {
+        _questions =
+        [
             new TrueFalseQuestion
             {
                 Statement = "In .NET MAUI, TwoWay is the default binding mode for a Label's Text property.",
@@ -60,9 +60,9 @@ public partial class TrueFalseQuizViewModel : ObservableObject
                 Statement = "CollectionView creates visual elements for every single item in a 10,000-item list all at once.",
                 CorrectAnswer = false
             }
-        };
+        ];
 
-        _currentQuestion = _questions[0];
+        CurrentQuestion = _questions[0];
     }
 
     public double ProgressValue => (double)(CurrentIndex + 1) / _questions.Count;

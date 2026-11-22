@@ -13,16 +13,16 @@ public partial class QuizViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(ProgressText))]
     [NotifyPropertyChangedFor(nameof(CanGoBack))]
     [NotifyCanExecuteChangedFor(nameof(PreviousCommand))]
-    private int _currentIndex;
+    public partial int CurrentIndex {get; set; }
     [ObservableProperty]
-    private Question? _currentQuestion;
+    public partial Question CurrentQuestion { get; set; }
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(NextCommand))]
-    private bool _isNextEnabled;
+    public partial bool IsNextEnabled {get; set; }
     [ObservableProperty]
-    private bool _isAnalyzing;
+    public partial bool IsAnalyzing {get; set; }
     [ObservableProperty]
-    private bool _isSummaryVisible;
+    public partial bool IsSummaryVisible {get; set; }
     public ObservableCollection<SummaryItem> SummaryResults { get; } = [];
 
     // Circular progress properties
@@ -40,7 +40,7 @@ public partial class QuizViewModel : ObservableObject
             new Question { Text = "My sleep patterns have been disrupted recently.", Options = CreateDefaultOptions() },
             new Question { Text = "I feel overwhelmed by everyday responsibilities.", Options = CreateDefaultOptions() }
         ];
-        _currentQuestion = _questions[0];
+        CurrentQuestion = _questions[0];
     }
 
     private static ObservableCollection<AnswerOption> CreateDefaultOptions() =>

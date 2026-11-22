@@ -10,5 +10,5 @@ public partial class FillInQuestion : ObservableObject
     public string Hint { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _userInput = string.Empty;
+    public partial string UserInput {get; set; } = string.Empty;
 }

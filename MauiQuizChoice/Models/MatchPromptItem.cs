@@ -8,16 +8,16 @@ public partial class MatchPromptItem : ObservableObject
     public string Text { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private bool _isActive;
+    public partial bool IsActive {get; set; }
 
     [ObservableProperty]
-    private bool _isMatched;
+    public partial bool IsMatched {get; set; }
 
     [ObservableProperty]
-    private string _matchedBadgeText = string.Empty;
+    public partial string MatchedBadgeText {get; set; } = string.Empty;
 
     [ObservableProperty]
-    private string _matchedTargetText = string.Empty;
+    public partial string MatchedTargetText {get; set; } = string.Empty;
 }
 
 public partial class MatchTargetItem : ObservableObject
@@ -26,10 +26,10 @@ public partial class MatchTargetItem : ObservableObject
     public string Text { get; set; } = string.Empty;
 
     [ObservableProperty]
-    private bool _isMatched;
+    public partial bool IsMatched {get; set; }
 
     [ObservableProperty]
-    private string _matchedBadgeText = string.Empty;
+    public partial string MatchedBadgeText {get; set; } = string.Empty;
 }
 
 public class MatchingRound

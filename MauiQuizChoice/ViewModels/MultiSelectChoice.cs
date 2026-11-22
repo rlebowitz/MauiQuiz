@@ -20,25 +20,25 @@ public partial class MultiSelectQuizViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(ProgressText))]
     [NotifyPropertyChangedFor(nameof(CanGoBack))]
     [NotifyCanExecuteChangedFor(nameof(PreviousCommand))]
-    private int _currentIndex;
+    public partial int CurrentIndex {get; set; }
 
     [ObservableProperty]
-    private MultiSelectQuestion _currentQuestion;
+    public partial MultiSelectQuestion CurrentQuestion { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(NextCommand))]
-    private bool _isNextEnabled;
+    public partial bool IsNextEnabled {get; set; }
 
     [ObservableProperty]
-    private bool _isAnalyzing;
+    public partial bool IsAnalyzing {get; set; }
 
     [ObservableProperty]
-    private bool _isSummaryVisible;
+    public partial bool IsSummaryVisible {get; set; }
 
     [ObservableProperty]
-    private string _scoreSummaryText = string.Empty;
+    public partial string ScoreSummaryText {get; set; } = string.Empty;
 
-    public ObservableCollection<MultiSelectReviewItem> ReviewResults { get; } = new();
+    public ObservableCollection<MultiSelectReviewItem> ReviewResults { get; } = [];
 
     public MultiSelectQuizViewModel()
     {
@@ -79,7 +79,7 @@ public partial class MultiSelectQuizViewModel : ObservableObject
             }
         };
 
-        _currentQuestion = _questions[0];
+        CurrentQuestion = _questions[0];
     }
 
     public double ProgressValue => (double)(CurrentIndex + 1) / _questions.Count;

@@ -15,30 +15,32 @@ public partial class MatchingQuizViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ProgressValue))]
     [NotifyPropertyChangedFor(nameof(ProgressText))]
+    [NotifyPropertyChangedFor(nameof(ProgressValue))]
+    [NotifyPropertyChangedFor(nameof(ProgressText))]
     [NotifyPropertyChangedFor(nameof(CanGoBack))]
     [NotifyCanExecuteChangedFor(nameof(PreviousCommand))]
-    private int _currentIndex;
+    public partial int CurrentIndex {get; set; }
 
     [ObservableProperty]
-    private MatchingRound _currentRound;
+    public partial MatchingRound CurrentRound { get; set; }
 
     [ObservableProperty]
-    private MatchPromptItem? _activePrompt;
+    public partial MatchPromptItem? ActivePrompt { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(NextCommand))]
-    private bool _isNextEnabled;
+    public partial bool IsNextEnabled {get; set; }
 
     [ObservableProperty]
-    private bool _isAnalyzing;
+    public partial bool IsAnalyzing {get; set; }
 
     [ObservableProperty]
-    private bool _isSummaryVisible;
+    public partial bool IsSummaryVisible {get; set; }
 
     [ObservableProperty]
-    private string _scoreSummaryText = string.Empty;
+    public partial string ScoreSummaryText {get; set; } = string.Empty;
 
-    public ObservableCollection<MatchReviewItem> ReviewResults { get; } = new();
+    public ObservableCollection<MatchReviewItem> ReviewResults { get; } = [];
 
     public MatchingQuizViewModel()
     {
@@ -78,7 +80,7 @@ public partial class MatchingQuizViewModel : ObservableObject
             }
         };
 
-        _currentRound = _rounds[0];
+        CurrentRound = _rounds[0];
     }
 
     public double ProgressValue => (double)(CurrentIndex + 1) / _rounds.Count;
