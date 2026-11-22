@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MauiQuizChoice.ViewModels"
+             x:Class="MauiQuizChoice.Views.HomePage"
+             x:DataType="vm:HomeViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#F8F9FB">
+
+    <ContentPage.BindingContext>
+        <vm:HomeViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="230, *">
+
+        <!-- Curved Purple Header -->
+        <Border Grid.Row="0"
+                BackgroundColor="#6B66F6"
+                StrokeThickness="0"
+                Margin="-40,-50,-40,0">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0,0,180,180" />
+            </Border.StrokeShape>
+        </Border>
+
+        <!-- Header Branding & Greeting -->
+        <VerticalStackLayout Grid.Row="0"
+                             VerticalOptions="Center"
+                             Padding="28,16,28,24"
+                             Spacing="10">
+            <Border WidthRequest="48"
+                    HeightRequest="48"
+                    BackgroundColor="#5752D8"
+                    StrokeThickness="0"
+                    HorizontalOptions="Center">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="24" />
+                </Border.StrokeShape>
+                <Label Text="?"
+                       TextColor="White"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center" />
+            </Border>
+
+            <Label Text="Knowledge Check"
+                   TextColor="White"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center" />
+
+            <Label Text="Choose a quiz format below to begin"
+                   TextColor="#E0E7FF"
+                   FontSize="14"
+                   HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+
+        <!-- Quiz Mode Cards -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding QuizModes}"
+                        Margin="24,14,24,24"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:QuizModeCard">
+                    <Grid Padding="0,8">
+                        <Border BackgroundColor="White"
+                                Stroke="#E2E8F0"
+                                StrokeThickness="1.5"
+                                Padding="18">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="14" />
+                            </Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=LaunchQuizCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="14">
+                                <!-- Left Mode Icon Badge -->
+                                <Border Grid.Column="0"
+                                        WidthRequest="48"
+                                        HeightRequest="48"
+                                        BackgroundColor="{Binding IconBackgroundHex}"
+                                        StrokeThickness="0"
+                                        VerticalOptions="Center">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="12" />
+                                    </Border.StrokeShape>
+                                    <Label Text="{Binding IconGlyph}"
+                                           TextColor="{Binding IconTextHex}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center" />
+                                </Border>
+
+                                <!-- Title, Subtitle & Question Count Pill -->
+                                <VerticalStackLayout Grid.Column="1"
+                                                     VerticalOptions="Center"
+                                                     Spacing="4">
+                                    <Label Text="{Binding Title}"
+                                           TextColor="#2D3748"
+                                           FontSize="16"
+                                           FontAttributes="Bold" />
+
+                                    <Label Text="{Binding Subtitle}"
+                                           TextColor="#64748B"
+                                           FontSize="13"
+                                           LineBreakMode="WordWrap" />
+
+                                    <Border BackgroundColor="#F1F5F9"
+                                            StrokeThickness="0"
+                                            Padding="8,3"
+                                            Margin="0,4,0,0"
+                                            HorizontalOptions="Start">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="6" />
+                                        </Border.StrokeShape>
+                                        <Label Text="{Binding QuestionCountBadge}"
+                                               TextColor="#475569"
+                                               FontSize="11"
+                                               FontAttributes="Bold" />
+                                    </Border>
+                                </VerticalStackLayout>
+
+                                <!-- Right Launch Chevron -->
+                                <Label Grid.Column="2"
+                                       Text="›"
+                                       TextColor="#4FA8F6"
+                                       FontSize="26"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

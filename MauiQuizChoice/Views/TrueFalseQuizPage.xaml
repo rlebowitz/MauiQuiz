@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MauiQuizChoice.ViewModels"
+             xmlns:controls="clr-namespace:MauiQuizChoice.Controls"
+             x:Class="MauiQuizChoice.Views.TrueFalseQuizPage"
+             x:DataType="vm:TrueFalseQuizViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#F8F9FB">
+
+    <ContentPage.BindingContext>
+        <vm:TrueFalseQuizViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <!-- 1. MAIN TRUE / FALSE QUIZ VIEW -->
+        <Grid RowDefinitions="260, *, Auto">
+
+            <!-- Curved Purple Header -->
+            <Border Grid.Row="0"
+                    BackgroundColor="#6B66F6"
+                    StrokeThickness="0"
+                    Margin="-40,-50,-40,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="0,0,180,180" />
+                </Border.StrokeShape>
+            </Border>
+
+            <!-- Header Navigation + Progress + Statement -->
+            <VerticalStackLayout Grid.Row="0"
+                                 Padding="24,16,24,24"
+                                 Spacing="14">
+                <Grid ColumnDefinitions="40, *, 40" HeightRequest="36">
+                    <Border Grid.Column="0"
+                            BackgroundColor="Transparent"
+                            StrokeThickness="0"
+                            IsVisible="{Binding CanGoBack}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding PreviousCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label Text="←"
+                               TextColor="White"
+                               FontSize="22"
+                               HorizontalOptions="Start"
+                               VerticalOptions="Center" />
+                    </Border>
+
+                    <Border Grid.Column="2"
+                            BackgroundColor="Transparent"
+                            StrokeThickness="0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding RestartCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label Text="✕"
+                               TextColor="White"
+                               FontSize="16"
+                               HorizontalOptions="End"
+                               VerticalOptions="Center" />
+                    </Border>
+                </Grid>
+
+                <controls:CircularProgressView Progress="{Binding ProgressValue}"
+                                               Text="{Binding ProgressText}"
+                                               HorizontalOptions="Center" />
+
+                <Label Text="{Binding CurrentQuestion.Statement}"
+                       TextColor="White"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+
+            <!-- Side-by-Side True / False Selection Cards -->
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*, *"
+                  ColumnSpacing="16"
+                  Margin="24,0"
+                  VerticalOptions="Center">
+
+                <!-- TRUE CARD -->
+                <Border Grid.Column="0"
+                        BackgroundColor="White"
+                        Stroke="#E2E8F0"
+                        StrokeThickness="1.5"
+                        HeightRequest="170"
+                        Padding="16">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectAnswerCommand}"
+                                              CommandParameter="True" />
+                    </Border.GestureRecognizers>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding CurrentQuestion.IsTrueSelected}"
+                                     Value="True">
+                            <Setter Property="Stroke" Value="#4FA8F6" />
+                            <Setter Property="StrokeThickness" Value="2.5" />
+                            <Setter Property="BackgroundColor" Value="#EFF6FF" />
+                        </DataTrigger>
+                    </Border.Triggers>
+
+                    <VerticalStackLayout VerticalOptions="Center"
+                                         HorizontalOptions="Center"
+                                         Spacing="14">
+                        <Border WidthRequest="52"
+                                HeightRequest="52"
+                                BackgroundColor="#F1F5F9"
+                                StrokeThickness="0"
+                                HorizontalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="26" />
+                            </Border.StrokeShape>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border"
+                                             Binding="{Binding CurrentQuestion.IsTrueSelected}"
+                                             Value="True">
+                                    <Setter Property="BackgroundColor" Value="#4FA8F6" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Label Text="✓"
+                                   TextColor="#64748B"
+                                   FontSize="22"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding CurrentQuestion.IsTrueSelected}"
+                                                 Value="True">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Border>
+
+                        <Label Text="True"
+                               TextColor="#2D3748"
+                               FontSize="17"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- FALSE CARD -->
+                <Border Grid.Column="1"
+                        BackgroundColor="White"
+                        Stroke="#E2E8F0"
+                        StrokeThickness="1.5"
+                        HeightRequest="170"
+                        Padding="16">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16" />
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectAnswerCommand}"
+                                              CommandParameter="False" />
+                    </Border.GestureRecognizers>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border"
+                                     Binding="{Binding CurrentQuestion.IsFalseSelected}"
+                                     Value="True">
+                            <Setter Property="Stroke" Value="#4FA8F6" />
+                            <Setter Property="StrokeThickness" Value="2.5" />
+                            <Setter Property="BackgroundColor" Value="#EFF6FF" />
+                        </DataTrigger>
+                    </Border.Triggers>
+
+                    <VerticalStackLayout VerticalOptions="Center"
+                                         HorizontalOptions="Center"
+                                         Spacing="14">
+                        <Border WidthRequest="52"
+                                HeightRequest="52"
+                                BackgroundColor="#F1F5F9"
+                                StrokeThickness="0"
+                                HorizontalOptions="Center">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="26" />
+                            </Border.StrokeShape>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border"
+                                             Binding="{Binding CurrentQuestion.IsFalseSelected}"
+                                             Value="True">
+                                    <Setter Property="BackgroundColor" Value="#4FA8F6" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Label Text="✕"
+                                   TextColor="#64748B"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label"
+                                                 Binding="{Binding CurrentQuestion.IsFalseSelected}"
+                                                 Value="True">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Border>
+
+                        <Label Text="False"
+                               TextColor="#2D3748"
+                               FontSize="17"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Bottom "Next" Pill Button -->
+            <Button Grid.Row="2"
+                    Text="Next"
+                    Command="{Binding NextCommand}"
+                    HeightRequest="52"
+                    CornerRadius="26"
+                    FontSize="16"
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    BackgroundColor="#D1D5DB"
+                    Margin="24,10,24,36">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsNextEnabled}" Value="True">
+                        <Setter Property="BackgroundColor" Value="#4FA8F6" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+        </Grid>
+
+        <!-- 2. "ANALYSING YOUR ANSWERS" OVERLAY -->
+        <Grid BackgroundColor="#6B66F6"
+              IsVisible="{Binding IsAnalyzing}">
+            <VerticalStackLayout VerticalOptions="Center"
+                                 HorizontalOptions="Center"
+                                 Spacing="24">
+                <Border WidthRequest="84"
+                        HeightRequest="105"
+                        BackgroundColor="#C7D2FE"
+                        StrokeThickness="0"
+                        Padding="14"
+                        HorizontalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="10" VerticalOptions="Center">
+                        <BoxView HeightRequest="8" WidthRequest="32" CornerRadius="4" Color="White" HorizontalOptions="Start" />
+                        <BoxView HeightRequest="8" WidthRequest="54" CornerRadius="4" Color="White" HorizontalOptions="Start" />
+                        <BoxView HeightRequest="8" WidthRequest="44" CornerRadius="4" Color="White" HorizontalOptions="Start" />
+                        <BoxView HeightRequest="8" WidthRequest="50" CornerRadius="4" Color="#818CF8" HorizontalOptions="Start" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="Analysing your answers"
+                       TextColor="White"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- 3. SUMMARY & SCORE SCREEN -->
+        <Grid RowDefinitions="200, *, Auto"
+              BackgroundColor="#F8F9FB"
+              IsVisible="{Binding IsSummaryVisible}">
+
+            <Border Grid.Row="0"
+                    BackgroundColor="#6B66F6"
+                    StrokeThickness="0"
+                    Margin="-40,-50,-40,0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="0,0,180,180" />
+                </Border.StrokeShape>
+            </Border>
+
+            <VerticalStackLayout Grid.Row="0"
+                                 VerticalOptions="Center"
+                                 Padding="24,10,24,20"
+                                 Spacing="8">
+                <Border WidthRequest="44" HeightRequest="44"
+                        BackgroundColor="#5752D8"
+                        StrokeThickness="0"
+                        HorizontalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="22" />
+                    </Border.StrokeShape>
+                    <Label Text="✓" TextColor="White" FontSize="20" FontAttributes="Bold"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+                </Border>
+
+                <Label Text="True / False Results"
+                       TextColor="White"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center" />
+
+                <Label Text="{Binding ScoreSummaryText}"
+                       TextColor="#E0E7FF"
+                       FontSize="14"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding ReviewResults}"
+                            Margin="24,12,24,0"
+                            SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:TrueFalseReviewItem">
+                        <Grid Padding="0,6">
+                            <Border BackgroundColor="White"
+                                    Stroke="#E2E8F0"
+                                    StrokeThickness="1.5"
+                                    Padding="16,14">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="10" />
+                                </Border.StrokeShape>
+                                <VerticalStackLayout Spacing="6">
+                                    <Label Text="{Binding Statement}"
+                                           TextColor="#2D3748"
+                                           FontSize="14" />
+                                    <HorizontalStackLayout Spacing="12">
+                                        <Label Text="{Binding UserAnswerText, StringFormat='Your answer: {0}'}"
+                                               TextColor="#6B66F6"
+                                               FontSize="13"
+                                               FontAttributes="Bold" />
+                                        <Label Text="{Binding CorrectAnswerText, StringFormat='Correct: {0}'}"
+                                               TextColor="#16A34A"
+                                               FontSize="13"
+                                               FontAttributes="Bold"
+                                               IsVisible="{Binding IsCorrect, Converter={StaticResource InvertedBoolConverter}}" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Grid.Row="2"
+                    Text="Retake Quiz"
+                    Command="{Binding RestartCommand}"
+                    BackgroundColor="#4FA8F6"
+                    TextColor="White"
+                    FontSize="16"
+                    FontAttributes="Bold"
+                    HeightRequest="52"
+                    CornerRadius="26"
+                    Margin="24,10,24,36" />
+        </Grid>
+    </Grid>
+</ContentPage>

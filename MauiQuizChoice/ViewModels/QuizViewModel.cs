@@ -113,6 +113,11 @@ public partial class QuizViewModel : ObservableObject
         CurrentQuestion = _questions[0];
         IsNextEnabled = false;
     }
+    [RelayCommand]
+    private static async Task CloseQuiz()
+    {
+        await Shell.Current.GoToAsync("..");
+    }
 
     private void BuildSummary()
     {
