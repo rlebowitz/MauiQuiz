@@ -1,155 +1,60 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using MauiQuizChoice.Models;
-using System.Collections.ObjectModel;
+﻿using MauiQuizChoice.Models;
 
 namespace MauiQuizChoice.ViewModels;
 
-public record FillInReviewItem(
-    string FullSentence,
-    string UserAnswer,
-    string CorrectAnswer,
-    bool IsCorrect);
-
-public partial class FillInQuizViewModel : ObservableObject
+public partial class FillInQuizViewModel : QuizViewModelBase<FillInQuestion, FillInReviewItem>
 {
-    private readonly List<FillInQuestion> _questions;
+    public FillInQuizViewModel() => InitializeQuiz();
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ProgressValue))]
-    [NotifyPropertyChangedFor(nameof(ProgressText))]
-    [NotifyPropertyChangedFor(nameof(CanGoBack))]
-    [NotifyCanExecuteChangedFor(nameof(PreviousCommand))]
-    public partial int CurrentIndex {get; set; }
+    public override bool IsNextEnabled =>
+        !string.IsNullOrWhiteSpace(CurrentItem?.UserInput);
 
-    [ObservableProperty]
-    public partial FillInQuestion CurrentQuestion { get; set; }
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(NextCommand))]
-    public partial bool IsNextEnabled {get; set; }
-
-    [ObservableProperty]
-    public partial bool IsAnalyzing {get; set; }
-
-    [ObservableProperty]
-    public partial bool IsSummaryVisible {get; set; }
-
-    [ObservableProperty]
-    public partial string ScoreSummaryText {get; set; } = string.Empty;
-
-    public ObservableCollection<FillInReviewItem> ReviewResults { get; } = [];
-
-    public FillInQuizViewModel()
+    protected override IEnumerable<FillInQuestion> CreateQuizItems()
     {
-        _questions =
+        return
         [
-            new FillInQuestion
-            {
+            new() {
                 PromptBeforeBlank = "In .NET MAUI, a GraphicsView requires calling ",
                 PromptAfterBlank = "() to trigger a canvas redraw.",
                 CorrectAnswer = "Invalidate",
                 Hint = "Method on IGraphicsView"
             },
-            new FillInQuestion
+            new()
             {
                 PromptBeforeBlank = "The ",
                 PromptAfterBlank = " attribute generates ICommand properties from methods.",
                 CorrectAnswer = "RelayCommand",
                 Hint = "CommunityToolkit.Mvvm attribute"
             },
-            new FillInQuestion
-            {
+            new() {
                 PromptBeforeBlank = "Use ",
                 PromptAfterBlank = " mode when UI edits must update the ViewModel property.",
                 CorrectAnswer = "TwoWay",
                 Hint = "Default for Entry.Text"
             }
         ];
-
-        CurrentQuestion = _questions[0];
-        HookCurrentQuestion();
     }
 
-    public double ProgressValue => (double)(CurrentIndex + 1) / _questions.Count;
-    public string ProgressText => $"{CurrentIndex + 1}/{_questions.Count}";
-    public bool CanGoBack => CurrentIndex > 0;
-
-    private void HookCurrentQuestion()
-    {
-        IsNextEnabled = !string.IsNullOrWhiteSpace(CurrentQuestion.UserInput);
-        CurrentQuestion.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(FillInQuestion.UserInput))
-            {
-                IsNextEnabled = !string.IsNullOrWhiteSpace(CurrentQuestion.UserInput);
-            }
-        };
-    }
-
-    [RelayCommand(CanExecute = nameof(IsNextEnabled))]
-    private async Task Next()
-    {
-        if (CurrentIndex < _questions.Count - 1)
-        {
-            CurrentIndex++;
-            CurrentQuestion = _questions[CurrentIndex];
-            HookCurrentQuestion();
-        }
-        else
-        {
-            IsAnalyzing = true;
-            await Task.Delay(2000);
-
-            BuildReview();
-            IsAnalyzing = false;
-            IsSummaryVisible = true;
-        }
-    }
-
-    [RelayCommand(CanExecute = nameof(CanGoBack))]
-    private void Previous()
-    {
-        if (CurrentIndex <= 0) return;
-
-        CurrentIndex--;
-        CurrentQuestion = _questions[CurrentIndex];
-        HookCurrentQuestion();
-    }
-
-    [RelayCommand]
-    private void Restart()
-    {
-        foreach (var q in _questions)
-            q.UserInput = string.Empty;
-
-        ReviewResults.Clear();
-        IsSummaryVisible = false;
-        IsAnalyzing = false;
-        CurrentIndex = 0;
-        CurrentQuestion = _questions[0];
-        HookCurrentQuestion();
-    }
-
-    private void BuildReview()
+    protected override void EvaluateResults(IReadOnlyList<FillInQuestion> items)
     {
         ReviewResults.Clear();
         int correctCount = 0;
 
-        foreach (var q in _questions)
+        foreach (var q in items)
         {
-            string trimmedUser = q.UserInput.Trim();
-            bool isCorrect = string.Equals(trimmedUser, q.CorrectAnswer, StringComparison.OrdinalIgnoreCase);
+            var trimmed = q.UserInput?.Trim() ?? string.Empty;
+            bool isCorrect = string.Equals(trimmed, q.CorrectAnswer, StringComparison.OrdinalIgnoreCase);
             if (isCorrect) correctCount++;
 
-            string sentence = $"{q.PromptBeforeBlank}[{q.CorrectAnswer}]{q.PromptAfterBlank}";
-            ReviewResults.Add(new FillInReviewItem(
-                sentence,
-                string.IsNullOrEmpty(trimmedUser) ? "(Blank)" : trimmedUser,
+            ReviewResults.Add(new FillInReviewItem
+            (
+                $"{q.PromptBeforeBlank} {q.CorrectAnswer} {q.PromptAfterBlank}",
+                string.IsNullOrEmpty(trimmed) ? "(blank)" : trimmed,
                 q.CorrectAnswer,
-                isCorrect));
+                isCorrect
+            ));
         }
 
-        ScoreSummaryText = $"You filled in {correctCount} of {_questions.Count} blanks correctly";
+        ScoreSummaryText = $"You scored {correctCount} out of {items.Count}";
     }
 }

@@ -11,7 +11,7 @@ public class SelectQuizPage : ContentPage
 {
     public SelectQuizPage()
     {
-        var viewModel = new QuizViewModel();
+        var viewModel = new SelectViewModel();
         BindingContext = viewModel;
 
         Shell.SetNavBarIsVisible(this, false);
@@ -28,7 +28,7 @@ public class SelectQuizPage : ContentPage
         };
     }
 
-    private static Grid BuildMainQuizView(QuizViewModel viewModel)
+    private static Grid BuildMainQuizView(SelectViewModel viewModel)
     {
         var nextButton = new Button
         {
@@ -45,7 +45,7 @@ public class SelectQuizPage : ContentPage
 
         nextButton.Triggers.Add(new DataTrigger(typeof(Button))
         {
-            Binding = new Binding(nameof(QuizViewModel.IsNextEnabled)),
+            Binding = new Binding(nameof(SelectViewModel.IsNextEnabled)),
             Value = true,
             Setters =
             {
@@ -95,7 +95,7 @@ public class SelectQuizPage : ContentPage
                                     }.Start().CenterVertical()
                                 }
                                 .Column(0)
-                                .Bind(IsVisibleProperty, static (QuizViewModel vm) => vm.CanGoBack),
+                                .Bind(IsVisibleProperty, static (SelectViewModel vm) => vm.CanGoBack),
 
                                 // Close / Reset Button
                                 new Border
@@ -116,8 +116,8 @@ public class SelectQuizPage : ContentPage
                         // Animated Circular Progress Indicator
                         new CircularProgressView()
                             .CenterHorizontal()
-                            .Bind(CircularProgressView.ProgressProperty, static (QuizViewModel vm) => vm.ProgressValue)
-                            .Bind(CircularProgressView.TextProperty, static (QuizViewModel vm) => vm.ProgressText),
+                            .Bind(CircularProgressView.ProgressProperty, static (SelectViewModel vm) => vm.ProgressValue)
+                            .Bind(CircularProgressView.TextProperty, static (SelectViewModel vm) => vm.ProgressText),
 
                         // Question Text
                         new Label
@@ -128,7 +128,7 @@ public class SelectQuizPage : ContentPage
                             LineBreakMode = LineBreakMode.WordWrap
                         }
                         .TextCenterHorizontal()
-                        .Bind(Label.TextProperty, static (QuizViewModel vm) => vm.CurrentQuestion.Text)
+                        .Bind(Label.TextProperty, static (SelectViewModel vm) => vm.CurrentItem.Text)
                     }
                 }.Row(0),
 
@@ -140,7 +140,7 @@ public class SelectQuizPage : ContentPage
                     ItemTemplate = new DataTemplate(() => CreateOptionCard(viewModel))
                 }
                 .Row(1)
-                .Bind(ItemsView.ItemsSourceProperty, static (QuizViewModel vm) => vm.CurrentQuestion.Options),
+                .Bind(ItemsView.ItemsSourceProperty, static (SelectViewModel vm) => vm.CurrentItem.Options),
 
                 // Bottom "Next" Pill Button
                 nextButton
@@ -148,7 +148,7 @@ public class SelectQuizPage : ContentPage
         };
     }
 
-    private static View CreateOptionCard(QuizViewModel viewModel)
+    private static View CreateOptionCard(SelectViewModel viewModel)
     {
         var tapGesture = new TapGestureRecognizer
         {
@@ -271,9 +271,9 @@ public class SelectQuizPage : ContentPage
                     }
                 }.Center()
             }
-        }.Bind(IsVisibleProperty, static (QuizViewModel vm) => vm.IsAnalyzing);
+        }.Bind(IsVisibleProperty, static (SelectViewModel vm) => vm.IsAnalyzing);
 
-    private static Grid BuildSummaryView(QuizViewModel viewModel) =>
+    private static Grid BuildSummaryView(SelectViewModel viewModel) =>
         new Grid
         {
             RowDefinitions = Rows.Define(200, Star, Auto),
@@ -334,7 +334,7 @@ public class SelectQuizPage : ContentPage
                     ItemTemplate = new DataTemplate(CreateSummaryItemCard)
                 }
                 .Row(1)
-                .Bind(ItemsView.ItemsSourceProperty, static (QuizViewModel vm) => vm.SummaryResults),
+                .Bind(ItemsView.ItemsSourceProperty, static (SelectViewModel vm) => vm.ReviewResults),
 
                 // Bottom "Retake Quiz" Pill Button
                 new Button
@@ -350,7 +350,7 @@ public class SelectQuizPage : ContentPage
                     Margin = new Thickness(24, 10, 24, 36)
                 }.Row(2)
             }
-        }.Bind(IsVisibleProperty, static (QuizViewModel vm) => vm.IsSummaryVisible);
+        }.Bind(IsVisibleProperty, static (SelectViewModel vm) => vm.IsSummaryVisible);
 
     private static View CreateSummaryItemCard() =>
         new Grid

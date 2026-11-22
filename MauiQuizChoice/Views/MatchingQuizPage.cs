@@ -32,11 +32,11 @@ public class MatchingQuizPage : ContentPage
     {
         var promptsStack = new VerticalStackLayout { Spacing = 12 }.Column(0);
         BindableLayout.SetItemTemplate(promptsStack, new DataTemplate(() => CreatePromptCard(viewModel)));
-        promptsStack.Bind(BindableLayout.ItemsSourceProperty, static (MatchingQuizViewModel vm) => vm.CurrentRound.Prompts);
+        promptsStack.Bind(BindableLayout.ItemsSourceProperty, static (MatchingQuizViewModel vm) => vm.CurrentItem.Prompts);
 
         var targetsStack = new VerticalStackLayout { Spacing = 12 }.Column(1);
         BindableLayout.SetItemTemplate(targetsStack, new DataTemplate(() => CreateTargetCard(viewModel)));
-        targetsStack.Bind(BindableLayout.ItemsSourceProperty, static (MatchingQuizViewModel vm) => vm.CurrentRound.Targets);
+        targetsStack.Bind(BindableLayout.ItemsSourceProperty, static (MatchingQuizViewModel vm) => vm.CurrentItem.Targets);
 
         var nextButton = new Button
         {
@@ -131,7 +131,7 @@ public class MatchingQuizPage : ContentPage
                             LineBreakMode = LineBreakMode.WordWrap
                         }
                         .TextCenterHorizontal()
-                        .Bind(Label.TextProperty, static (MatchingQuizViewModel vm) => vm.CurrentRound.Instruction)
+                        .Bind(Label.TextProperty, static (MatchingQuizViewModel vm) => vm.CurrentItem.Instruction)
                     }
                 }.Row(0),
 

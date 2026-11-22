@@ -1,44 +1,15 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using MauiQuizChoice.Models;
-using System.Collections.ObjectModel;
 
 namespace MauiQuizChoice.ViewModels;
 
-public record TrueFalseReviewItem(string Statement, string UserAnswerText, string CorrectAnswerText, bool IsCorrect);
-
-public partial class TrueFalseQuizViewModel : ObservableObject
+public partial class TrueFalseQuizViewModel : QuizViewModelBase<TrueFalseQuestion, TrueFalseReviewItem>
 {
-    private readonly List<TrueFalseQuestion> _questions;
+    public TrueFalseQuizViewModel() => InitializeQuiz();
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ProgressValue))]
-    [NotifyPropertyChangedFor(nameof(ProgressText))]
-    [NotifyPropertyChangedFor(nameof(CanGoBack))]
-    [NotifyCanExecuteChangedFor(nameof(PreviousCommand))]
-    public partial int CurrentIndex {get; set; }
-
-    [ObservableProperty]
-    public partial TrueFalseQuestion CurrentQuestion { get; set; }
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(NextCommand))]
-    public partial bool IsNextEnabled {get; set; }
-
-    [ObservableProperty]
-    public partial bool IsAnalyzing {get; set; }
-
-    [ObservableProperty]
-    public partial bool IsSummaryVisible {get; set; }
-
-    [ObservableProperty]
-    public partial string ScoreSummaryText {get; set; } = string.Empty;
-
-    public ObservableCollection<TrueFalseReviewItem> ReviewResults { get; } = [];
-
-    public TrueFalseQuizViewModel()
+    protected override IEnumerable<TrueFalseQuestion> CreateQuizItems()
     {
-        _questions =
+        return
         [
             new TrueFalseQuestion
             {
@@ -61,91 +32,45 @@ public partial class TrueFalseQuizViewModel : ObservableObject
                 CorrectAnswer = false
             }
         ];
-
-        CurrentQuestion = _questions[0];
     }
-
-    public double ProgressValue => (double)(CurrentIndex + 1) / _questions.Count;
-    public string ProgressText => $"{CurrentIndex + 1}/{_questions.Count}";
-    public bool CanGoBack => CurrentIndex > 0;
+    public override bool IsNextEnabled =>
+        CurrentItem is not null && (CurrentItem.IsTrueSelected || CurrentItem.IsFalseSelected);
 
     [RelayCommand]
     private void SelectAnswer(string choice)
     {
-        if (bool.TryParse(choice, out bool parsedChoice))
-        {
-            CurrentQuestion.UserAnswer = parsedChoice;
-            IsNextEnabled = true;
-        }
+        bool isTrue = string.Equals(choice, "True", StringComparison.OrdinalIgnoreCase);
+        CurrentItem.IsTrueSelected = isTrue;
+        CurrentItem.IsFalseSelected = !isTrue;
+
+        NotifyQuizStateChanged();
     }
 
-    [RelayCommand(CanExecute = nameof(IsNextEnabled))]
-    private async Task Next()
-    {
-        if (CurrentIndex < _questions.Count - 1)
-        {
-            CurrentIndex++;
-            CurrentQuestion = _questions[CurrentIndex];
-            IsNextEnabled = CurrentQuestion.UserAnswer.HasValue;
-        }
-        else
-        {
-            IsAnalyzing = true;
-            await Task.Delay(2000);
-
-            BuildReview();
-            IsAnalyzing = false;
-            IsSummaryVisible = true;
-        }
-    }
-
-    [RelayCommand(CanExecute = nameof(CanGoBack))]
-    private void Previous()
-    {
-        if (CurrentIndex <= 0) return;
-
-        CurrentIndex--;
-        CurrentQuestion = _questions[CurrentIndex];
-        IsNextEnabled = CurrentQuestion.UserAnswer.HasValue;
-    }
-
-    [RelayCommand]
-    private void Restart()
-    {
-        foreach (var q in _questions)
-        {
-            q.UserAnswer = null;
-        }
-
-        ReviewResults.Clear();
-        IsSummaryVisible = false;
-        IsAnalyzing = false;
-        CurrentIndex = 0;
-        CurrentQuestion = _questions[0];
-        IsNextEnabled = false;
-    }
-    [RelayCommand]
-    private static async Task CloseQuiz()
-    {
-        await Shell.Current.GoToAsync("..");
-    }
-
-    private void BuildReview()
+    protected override void EvaluateResults(IReadOnlyList<TrueFalseQuestion> items)
     {
         ReviewResults.Clear();
         int correctCount = 0;
 
-        foreach (var q in _questions)
+        foreach (var q in items)
         {
-            bool isCorrect = q.UserAnswer == q.CorrectAnswer;
+            bool userChoice = q.IsTrueSelected;
+            bool isCorrect = userChoice == q.CorrectAnswer;
             if (isCorrect) correctCount++;
-
-            string userText = q.UserAnswer.HasValue ? (q.UserAnswer.Value ? "True" : "False") : "Unanswered";
-            string correctText = q.CorrectAnswer ? "True" : "False";
-
-            ReviewResults.Add(new TrueFalseReviewItem(q.Statement, userText, correctText, isCorrect));
+            var item = new TrueFalseReviewItem(
+                q.Statement,
+                userChoice ? "True" : "False",
+                q.CorrectAnswer ? "True" : "False",
+                isCorrect
+            );
+            ReviewResults.Add(item);
         }
 
-        ScoreSummaryText = $"You got {correctCount} out of {_questions.Count} statements right";
+        ScoreSummaryText = $"You scored {correctCount} out of {items.Count}";
+    }
+
+    [RelayCommand]
+    private static async Task CloseQuiz()
+    {
+        await Shell.Current.GoToAsync("..");
     }
 }

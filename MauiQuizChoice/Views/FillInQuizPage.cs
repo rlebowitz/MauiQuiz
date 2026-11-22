@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui.Markup;
 using MauiQuizChoice.Controls;
+using MauiQuizChoice.Models;
 using MauiQuizChoice.ViewModels;
 using Microsoft.Maui.Controls.Shapes;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
@@ -46,7 +47,7 @@ public class FillInQuizPage : ContentPage
                 ClearButtonVisibility = ClearButtonVisibility.WhileEditing,
                 ReturnType = ReturnType.Next,
                 ReturnCommand = viewModel.NextCommand
-            }.Bind(Entry.TextProperty, static (FillInQuizViewModel vm) => vm.CurrentQuestion.UserInput)
+            }.Bind(Entry.TextProperty, static (FillInQuizViewModel vm) => vm.CurrentItem.UserInput)
         };
 
         inputBorder.Triggers.Add(new DataTrigger(typeof(Border))
@@ -159,7 +160,7 @@ public class FillInQuizPage : ContentPage
                                     {
                                         TextColor = Colors.White,
                                         FontAttributes = FontAttributes.Bold
-                                    }.Bind(Span.TextProperty, static (FillInQuizViewModel vm) => vm.CurrentQuestion.PromptBeforeBlank),
+                                    }.Bind(Span.TextProperty, static (FillInQuizViewModel vm) => vm.CurrentItem.PromptBeforeBlank),
 
                                     new Span
                                     {
@@ -172,7 +173,7 @@ public class FillInQuizPage : ContentPage
                                     {
                                         TextColor = Colors.White,
                                         FontAttributes = FontAttributes.Bold
-                                    }.Bind(Span.TextProperty, static (FillInQuizViewModel vm) => vm.CurrentQuestion.PromptAfterBlank)
+                                    }.Bind(Span.TextProperty, static (FillInQuizViewModel vm) => vm.CurrentItem.PromptAfterBlank)
                                 }
                             }
                         }.TextCenterHorizontal()
@@ -201,7 +202,7 @@ public class FillInQuizPage : ContentPage
                                 FontAttributes = FontAttributes.Bold
                             }.Bind(
                                 Label.TextProperty,
-                                static (FillInQuizViewModel vm) => vm.CurrentQuestion.Hint,
+                                static (FillInQuizViewModel vm) => vm.CurrentItem.Hint,
                                 stringFormat: "Hint: {0}")
                         }.Start()
                     }

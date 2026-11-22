@@ -10,8 +10,8 @@ public partial class TrueFalseQuestion : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsTrueSelected))]
     [NotifyPropertyChangedFor(nameof(IsFalseSelected))]
-    private bool? _userAnswer;
+    public partial bool? UserAnswer { get; set; }
 
-    public bool IsTrueSelected => UserAnswer == true;
-    public bool IsFalseSelected => UserAnswer == false;
+    public bool IsTrueSelected {get { return UserAnswer == true; } set { UserAnswer = value; } }
+    public bool IsFalseSelected {get { return UserAnswer == false; } set { UserAnswer = value; } }
 }

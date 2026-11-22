@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui.Markup;
 using MauiQuizChoice.Controls;
+using MauiQuizChoice.Models;
 using MauiQuizChoice.ViewModels;
 using Microsoft.Maui.Controls.Shapes;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
@@ -122,7 +123,7 @@ public class TrueFalseQuizPage : ContentPage
                             LineBreakMode = LineBreakMode.WordWrap
                         }
                         .TextCenterHorizontal()
-                        .Bind(Label.TextProperty, static (TrueFalseQuizViewModel vm) => vm.CurrentQuestion.Statement)
+                        .Bind(Label.TextProperty, static (TrueFalseQuizViewModel vm) => vm.CurrentItem.Statement)
                     }
                 }.Row(0),
 
@@ -140,7 +141,7 @@ public class TrueFalseQuizPage : ContentPage
                             glyph: "✓",
                             glyphSize: 22,
                             commandParameter: "True",
-                            selectedBindingPath: $"{nameof(TrueFalseQuizViewModel.CurrentQuestion)}.IsTrueSelected"
+                            selectedBindingPath: $"{nameof(TrueFalseQuizViewModel.CurrentItem)}.IsTrueSelected"
                         ).Column(0),
 
                         CreateChoiceCard(
@@ -149,7 +150,7 @@ public class TrueFalseQuizPage : ContentPage
                             glyph: "✕",
                             glyphSize: 20,
                             commandParameter: "False",
-                            selectedBindingPath: $"{nameof(TrueFalseQuizViewModel.CurrentQuestion)}.IsFalseSelected"
+                            selectedBindingPath: $"{nameof(TrueFalseQuizViewModel.CurrentItem)}.IsFalseSelected"
                         ).Column(1)
                     }
                 }.Row(1).CenterVertical(),

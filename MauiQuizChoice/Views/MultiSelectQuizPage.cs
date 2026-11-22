@@ -140,7 +140,7 @@ public class MultiSelectQuizPage : ContentPage
                             LineBreakMode = LineBreakMode.WordWrap
                         }
                         .TextCenterHorizontal()
-                        .Bind(Label.TextProperty, static (MultiSelectQuizViewModel vm) => vm.CurrentQuestion.Text)
+                        .Bind(Label.TextProperty, static (MultiSelectQuizViewModel vm) => vm.CurrentItem.Text)
                     }
                 }.Row(0),
 
@@ -152,7 +152,7 @@ public class MultiSelectQuizPage : ContentPage
                     ItemTemplate = new DataTemplate(() => CreateOptionCard(viewModel))
                 }
                 .Row(1)
-                .Bind(ItemsView.ItemsSourceProperty, static (MultiSelectQuizViewModel vm) => vm.CurrentQuestion.Options),
+                .Bind(ItemsView.ItemsSourceProperty, static (MultiSelectQuizViewModel vm) => vm.CurrentItem.Options),
 
                 // Bottom "Next" Pill Button
                 nextButton
