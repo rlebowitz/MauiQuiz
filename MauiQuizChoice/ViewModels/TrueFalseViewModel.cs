@@ -68,9 +68,9 @@ public partial class TrueFalseQuizViewModel : QuizViewModelBase<TrueFalseQuestio
         ScoreSummaryText = $"You scored {correctCount} out of {items.Count}";
     }
 
-    [RelayCommand]
-    private static async Task CloseQuiz()
-    {
-        await Shell.Current.GoToAsync("..");
-    }
+    //[RelayCommand]
+    //private static async Task CloseQuiz()
+    //{
+    //    await Shell.Current.GoToAsync("..");
+    //}
 }

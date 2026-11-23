@@ -81,7 +81,7 @@ public class FillInQuizPage : ContentPage
             Value = true,
             Setters =
             {
-                new Setter { Property = VisualElement.BackgroundColorProperty, Value = Color.FromArgb("#4FA8F6") }
+                new Setter { Property = BackgroundColorProperty, Value = Color.FromArgb("#4FA8F6") }
             }
         });
 
@@ -90,14 +90,7 @@ public class FillInQuizPage : ContentPage
             RowDefinitions = Rows.Define(265, Star, Auto),
             Children =
             {
-                // Curved Purple Header
-                new Border
-                {
-                    BackgroundColor = Color.FromArgb("#6B66F6"),
-                    StrokeThickness = 0,
-                    Margin = new Thickness(-40, -50, -40, 0),
-                    StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(0, 0, 180, 180) }
-                }.Row(0),
+                new CurvedHeaderBackground().Row(0),
 
                 // Header Navigation + Progress + Sentence with Blank
                 new VerticalStackLayout
@@ -106,41 +99,11 @@ public class FillInQuizPage : ContentPage
                     Spacing = 12,
                     Children =
                     {
-                        new Grid
+                        new QuizTopNavBar
                         {
-                            ColumnDefinitions = Columns.Define(40, Star, 40),
-                            HeightRequest = 36,
-                            Children =
-                            {
-                                new Border
-                                {
-                                    BackgroundColor = Colors.Transparent,
-                                    StrokeThickness = 0,
-                                    GestureRecognizers = { new TapGestureRecognizer { Command = viewModel.PreviousCommand } },
-                                    Content = new Label
-                                    {
-                                        Text = "←",
-                                        TextColor = Colors.White,
-                                        FontSize = 22
-                                    }.Start().CenterVertical()
-                                }
-                                .Column(0)
-                                .Bind(IsVisibleProperty, static (FillInQuizViewModel vm) => vm.CanGoBack),
-
-                                new Border
-                                {
-                                    BackgroundColor = Colors.Transparent,
-                                    StrokeThickness = 0,
-                                    GestureRecognizers = { new TapGestureRecognizer { Command = viewModel.RestartCommand } },
-                                    Content = new Label
-                                    {
-                                        Text = "✕",
-                                        TextColor = Colors.White,
-                                        FontSize = 16
-                                    }.End().CenterVertical()
-                                }.Column(2)
-                            }
-                        },
+                            PreviousCommand = viewModel.PreviousCommand,
+                            GoHomeCommand = viewModel.GoHomeCommand
+                        }.Bind(QuizTopNavBar.CanGoBackProperty, static (FillInQuizViewModel vm) => vm.CanGoBack),
 
                         new CircularProgressView()
                             .CenterHorizontal()
@@ -214,126 +177,23 @@ public class FillInQuizPage : ContentPage
         };
     }
 
-    private static Grid BuildAnalyzingOverlay() =>
-        new Grid
-        {
-            BackgroundColor = Color.FromArgb("#6B66F6"),
-            Children =
-            {
-                new VerticalStackLayout
-                {
-                    Spacing = 24,
-                    Children =
-                    {
-                        new Border
-                        {
-                            BackgroundColor = Color.FromArgb("#C7D2FE"),
-                            StrokeThickness = 0,
-                            Padding = 14,
-                            StrokeShape = new RoundRectangle { CornerRadius = 8 },
-                            Content = new VerticalStackLayout
-                            {
-                                Spacing = 10,
-                                Children =
-                                {
-                                    new BoxView { HeightRequest = 8, WidthRequest = 32, CornerRadius = 4, Color = Colors.White }.Start(),
-                                    new BoxView { HeightRequest = 8, WidthRequest = 54, CornerRadius = 4, Color = Colors.White }.Start(),
-                                    new BoxView { HeightRequest = 8, WidthRequest = 44, CornerRadius = 4, Color = Colors.White }.Start(),
-                                    new BoxView { HeightRequest = 8, WidthRequest = 50, CornerRadius = 4, Color = Color.FromArgb("#818CF8") }.Start()
-                                }
-                            }.CenterVertical()
-                        }.Size(84, 105).CenterHorizontal(),
+    private static AnalyzingOverlayView BuildAnalyzingOverlay() =>
+        new AnalyzingOverlayView()
+            .Bind(IsVisibleProperty, static (FillInQuizViewModel vm) => vm.IsAnalyzing);
 
-                        new Label
-                        {
-                            Text = "Analysing your answers",
-                            TextColor = Colors.White,
-                            FontSize = 18,
-                            FontAttributes = FontAttributes.Bold
-                        }.CenterHorizontal()
-                    }
-                }.Center()
-            }
-        }.Bind(IsVisibleProperty, static (FillInQuizViewModel vm) => vm.IsAnalyzing);
+    private static QuizSummaryView BuildSummaryView(FillInQuizViewModel viewModel) =>
+        new QuizSummaryView {
+            Title = "Fill-in-the-Blank Results",
+            RetakeButtonText = "Retake Quiz",
+            RetakeCommand = viewModel.RestartCommand,
+            GoHomeCommand = viewModel.GoHomeCommand,
+            ItemTemplate = new DataTemplate(CreateReviewItemCard)
+        }
+        .Bind(IsVisibleProperty, static (FillInQuizViewModel vm) => vm.IsSummaryVisible)
+        .Bind(QuizSummaryView.SubtitleProperty, static (FillInQuizViewModel vm) => vm.ScoreSummaryText)
+        .Bind(QuizSummaryView.ItemsSourceProperty, static (FillInQuizViewModel vm) => vm.ReviewResults);
 
-    private static Grid BuildSummaryView(FillInQuizViewModel viewModel) =>
-        new Grid
-        {
-            RowDefinitions = Rows.Define(200, Star, Auto),
-            BackgroundColor = Color.FromArgb("#F8F9FB"),
-            Children =
-            {
-                new Border
-                {
-                    BackgroundColor = Color.FromArgb("#6B66F6"),
-                    StrokeThickness = 0,
-                    Margin = new Thickness(-40, -50, -40, 0),
-                    StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(0, 0, 180, 180) }
-                }.Row(0),
-
-                new VerticalStackLayout
-                {
-                    Padding = new Thickness(24, 10, 24, 20),
-                    Spacing = 8,
-                    Children =
-                    {
-                        new Border
-                        {
-                            BackgroundColor = Color.FromArgb("#5752D8"),
-                            StrokeThickness = 0,
-                            StrokeShape = new RoundRectangle { CornerRadius = 22 },
-                            Content = new Label
-                            {
-                                Text = "✓",
-                                TextColor = Colors.White,
-                                FontSize = 20,
-                                FontAttributes = FontAttributes.Bold
-                            }.Center()
-                        }.Size(44).CenterHorizontal(),
-
-                        new Label
-                        {
-                            Text = "Fill-In Results",
-                            TextColor = Colors.White,
-                            FontSize = 20,
-                            FontAttributes = FontAttributes.Bold
-                        }.TextCenterHorizontal(),
-
-                        new Label
-                        {
-                            TextColor = Color.FromArgb("#E0E7FF"),
-                            FontSize = 14
-                        }
-                        .TextCenterHorizontal()
-                        .Bind(Label.TextProperty, static (FillInQuizViewModel vm) => vm.ScoreSummaryText)
-                    }
-                }.Row(0).CenterVertical(),
-
-                new CollectionView
-                {
-                    Margin = new Thickness(24, 12, 24, 0),
-                    SelectionMode = SelectionMode.None,
-                    ItemTemplate = new DataTemplate(CreateReviewItemCard)
-                }
-                .Row(1)
-                .Bind(ItemsView.ItemsSourceProperty, static (FillInQuizViewModel vm) => vm.ReviewResults),
-
-                new Button
-                {
-                    Text = "Retake Quiz",
-                    Command = viewModel.RestartCommand,
-                    BackgroundColor = Color.FromArgb("#4FA8F6"),
-                    TextColor = Colors.White,
-                    FontSize = 16,
-                    FontAttributes = FontAttributes.Bold,
-                    HeightRequest = 52,
-                    CornerRadius = 26,
-                    Margin = new Thickness(24, 10, 24, 36)
-                }.Row(2)
-            }
-        }.Bind(IsVisibleProperty, static (FillInQuizViewModel vm) => vm.IsSummaryVisible);
-
-    private static View CreateReviewItemCard() =>
+    private static Grid CreateReviewItemCard() =>
         new Grid
         {
             Padding = new Thickness(0, 6),

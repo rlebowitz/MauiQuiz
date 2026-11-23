@@ -1,18 +1,13 @@
-﻿using CommunityToolkit.Maui.Markup;
+﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Markup;
 using Microsoft.Maui.Controls.Shapes;
 
 namespace MauiQuizChoice.Controls;
 
-public class AnalyzingOverlayView : Grid
+public partial class AnalyzingOverlayView : Grid
 {
-    public static readonly BindableProperty MessageProperty =
-        BindableProperty.Create(nameof(Message), typeof(string), typeof(AnalyzingOverlayView), "Analysing your answers");
-
-    public string Message
-    {
-        get => (string)GetValue(MessageProperty);
-        set => SetValue(MessageProperty, value);
-    }
+    [BindableProperty]
+    public partial string Message { get; set; } = "Analyzing your answers";
 
     public AnalyzingOverlayView()
     {

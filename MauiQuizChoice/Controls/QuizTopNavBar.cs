@@ -1,37 +1,18 @@
 ﻿using System.Windows.Input;
+using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Markup;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 
 namespace MauiQuizChoice.Controls;
 
-public class QuizTopNavBar : Grid
+public partial class QuizTopNavBar : Grid
 {
-    public static readonly BindableProperty PreviousCommandProperty =
-        BindableProperty.Create(nameof(PreviousCommand), typeof(ICommand), typeof(QuizTopNavBar));
-
-    public static readonly BindableProperty GoHomeCommandProperty =
-        BindableProperty.Create(nameof(GoHomeCommand), typeof(ICommand), typeof(QuizTopNavBar));
-
-    public static readonly BindableProperty CanGoBackProperty =
-        BindableProperty.Create(nameof(CanGoBack), typeof(bool), typeof(QuizTopNavBar), false);
-
-    public ICommand? PreviousCommand
-    {
-        get => (ICommand?)GetValue(PreviousCommandProperty);
-        set => SetValue(PreviousCommandProperty, value);
-    }
-
-    public ICommand? GoHomeCommand
-    {
-        get => (ICommand?)GetValue(GoHomeCommandProperty);
-        set => SetValue(GoHomeCommandProperty, value);
-    }
-
-    public bool CanGoBack
-    {
-        get => (bool)GetValue(CanGoBackProperty);
-        set => SetValue(CanGoBackProperty, value);
-    }
+    [BindableProperty]
+    public partial ICommand? PreviousCommand { get; set; }
+    [BindableProperty]
+    public partial ICommand? GoHomeCommand { get; set; }
+    [BindableProperty]
+    public partial bool CanGoBack { get; set; } = false;
 
     public QuizTopNavBar()
     {

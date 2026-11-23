@@ -1,76 +1,33 @@
 ﻿using System.Collections;
 using System.Windows.Input;
+using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Markup;
 using Microsoft.Maui.Controls.Shapes;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 
 namespace MauiQuizChoice.Controls;
 
-public class QuizSummaryView : Grid
+public partial class QuizSummaryView : Grid
 {
-    public static readonly BindableProperty TitleProperty =
-        BindableProperty.Create(nameof(Title), typeof(string), typeof(QuizSummaryView), "Quiz Results");
+    [BindableProperty]
+    public partial string Title { get; set; } = "Quiz Results";
+    [BindableProperty]
+    public partial string Subtitle { get; set; } = string.Empty;
+    [BindableProperty]
+    public partial string RetakeButtonText { get; set; } = "Retake Quiz";
 
-    public static readonly BindableProperty SubtitleProperty =
-        BindableProperty.Create(nameof(Subtitle), typeof(string), typeof(QuizSummaryView), string.Empty);
+    [BindableProperty]
+    public partial IEnumerable? ItemsSource { get; set; }
 
-    public static readonly BindableProperty RetakeButtonTextProperty =
-        BindableProperty.Create(nameof(RetakeButtonText), typeof(string), typeof(QuizSummaryView), "Retake Quiz");
+    [BindableProperty]
+    public partial DataTemplate? ItemTemplate { get; set; }
 
-    public static readonly BindableProperty ItemsSourceProperty =
-        BindableProperty.Create(nameof(ItemsSource), typeof(IEnumerable), typeof(QuizSummaryView));
+    [BindableProperty]
+    public partial ICommand? RetakeCommand { get; set; }
 
-    public static readonly BindableProperty ItemTemplateProperty =
-        BindableProperty.Create(nameof(ItemTemplate), typeof(DataTemplate), typeof(QuizSummaryView));
-
-    public static readonly BindableProperty RetakeCommandProperty =
-        BindableProperty.Create(nameof(RetakeCommand), typeof(ICommand), typeof(QuizSummaryView));
-
-    public static readonly BindableProperty GoHomeCommandProperty =
-        BindableProperty.Create(nameof(GoHomeCommand), typeof(ICommand), typeof(QuizSummaryView));
-
-    public string Title
-    {
-        get => (string)GetValue(TitleProperty);
-        set => SetValue(TitleProperty, value);
-    }
-
-    public string Subtitle
-    {
-        get => (string)GetValue(SubtitleProperty);
-        set => SetValue(SubtitleProperty, value);
-    }
-
-    public string RetakeButtonText
-    {
-        get => (string)GetValue(RetakeButtonTextProperty);
-        set => SetValue(RetakeButtonTextProperty, value);
-    }
-
-    public IEnumerable? ItemsSource
-    {
-        get => (IEnumerable?)GetValue(ItemsSourceProperty);
-        set => SetValue(ItemsSourceProperty, value);
-    }
-
-    public DataTemplate? ItemTemplate
-    {
-        get => (DataTemplate?)GetValue(ItemTemplateProperty);
-        set => SetValue(ItemTemplateProperty, value);
-    }
-
-    public ICommand? RetakeCommand
-    {
-        get => (ICommand?)GetValue(RetakeCommandProperty);
-        set => SetValue(RetakeCommandProperty, value);
-    }
-
-    public ICommand? GoHomeCommand
-    {
-        get => (ICommand?)GetValue(GoHomeCommandProperty);
-        set => SetValue(GoHomeCommandProperty, value);
-    }
-
+    [BindableProperty]
+    public partial ICommand? GoHomeCommand { get; set; }    
+  
     public QuizSummaryView()
     {
         RowDefinitions = Rows.Define(200, Star, Auto);

@@ -4,6 +4,7 @@ namespace MauiQuizChoice.Controls;
 public partial class CircularProgressView : GraphicsView, IDrawable
 {
     private double _animatedProgress;
+
     [BindableProperty(PropertyChangedMethodName = nameof(OnProgressChanged))]
     public partial double Progress { get; set; }
 
