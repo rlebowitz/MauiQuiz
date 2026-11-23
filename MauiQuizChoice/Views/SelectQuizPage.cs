@@ -148,7 +148,7 @@ public class SelectQuizPage : ContentPage
         };
     }
 
-    private static View CreateOptionCard(SelectViewModel viewModel)
+    private static Grid CreateOptionCard(SelectViewModel viewModel)
     {
         var tapGesture = new TapGestureRecognizer
         {
@@ -181,7 +181,7 @@ public class SelectQuizPage : ContentPage
             Value = true,
             Setters =
             {
-                new Setter { Property = VisualElement.BackgroundColorProperty, Value = Color.FromArgb("#4FA8F6") },
+                new Setter { Property = BackgroundColorProperty, Value = Color.FromArgb("#4FA8F6") },
                 new Setter { Property = Border.StrokeProperty, Value = Color.FromArgb("#4FA8F6") }
             }
         });
