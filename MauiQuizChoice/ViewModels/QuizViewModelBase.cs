@@ -44,7 +44,7 @@ public abstract partial class QuizViewModelBase<TItem, TReview> : ObservableObje
     /// <summary>
     /// Subclasses provide a fresh list of questions or rounds when starting or restarting.
     /// </summary>
-    protected abstract IEnumerable<TItem> CreateQuizItems();
+    protected abstract List<TItem> CreateQuizItems();
 
     /// <summary>
     /// Subclasses evaluate all completed items and populate ReviewResults and ScoreSummaryText.

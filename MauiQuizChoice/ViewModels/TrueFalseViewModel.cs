@@ -8,7 +8,7 @@ public partial class TrueFalseQuizViewModel : QuizViewModelBase<TrueFalseQuestio
     public TrueFalseQuizViewModel() => InitializeQuiz();
     public override bool IsNextEnabled =>
       CurrentItem is not null && (CurrentItem.IsTrueSelected || CurrentItem.IsFalseSelected);
-    protected override IEnumerable<TrueFalseQuestion> CreateQuizItems()
+    protected override List<TrueFalseQuestion> CreateQuizItems()
     {
         return
         [

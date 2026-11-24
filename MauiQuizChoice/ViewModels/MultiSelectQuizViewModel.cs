@@ -15,7 +15,7 @@ public partial class MultiSelectQuizViewModel : QuizViewModelBase<MultiSelectQue
     public MultiSelectQuizViewModel() => InitializeQuiz();
     public override bool IsNextEnabled =>
         CurrentItem?.Options.Any(o => o.IsSelected) == true;
-    protected override IEnumerable<MultiSelectQuestion> CreateQuizItems()
+    protected override List<MultiSelectQuestion> CreateQuizItems()
     {
         return new List<MultiSelectQuestion>
         {

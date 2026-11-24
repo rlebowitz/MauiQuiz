@@ -98,7 +98,8 @@ public class FlashcardQuizPage : ContentPage
                                     text: "Needs Review",
                                     knownValue: false,
                                     activeColor: Color.FromArgb("#F59E0B"),
-                                    isSelectedSelector: static vm => vm.CurrentItem.Known == false
+                                    knownSelector: static vm => vm.CurrentItem.Known,
+                                    expectedValue: false
                                 ).Column(0),
 
                                 CreateAssessmentButton(
@@ -106,7 +107,8 @@ public class FlashcardQuizPage : ContentPage
                                     text: "Got It",
                                     knownValue: true,
                                     activeColor: Color.FromArgb("#16A34A"),
-                                    isSelectedSelector: static vm => vm.CurrentItem.Known == true
+                                    knownSelector: static vm => vm.CurrentItem.Known,
+                                    expectedValue: true
                                 ).Column(1)
                             }
                         }
@@ -220,7 +222,9 @@ public class FlashcardQuizPage : ContentPage
         string text,
         bool knownValue,
         Color activeColor,
-        Expression<Func<FlashcardQuizViewModel, bool>> isSelectedSelector)
+        Expression<Func<FlashcardQuizViewModel, bool?>> knownSelector,
+        bool expectedValue)
+
     {
         var label = new Label
         {
@@ -229,10 +233,10 @@ public class FlashcardQuizPage : ContentPage
             FontAttributes = FontAttributes.Bold
         }
         .Center()
-        .Bind<Label, FlashcardQuizViewModel, bool, Color>(
+        .Bind<Label, FlashcardQuizViewModel, bool?, Color>(
             Label.TextColorProperty,
-            getter: isSelectedSelector,
-            convert: selected => selected ? Colors.White : Color.FromArgb("#334155"));
+            getter: knownSelector,
+            convert: selected => selected == expectedValue ? Colors.White : Color.FromArgb("#334155"));
 
         return new Border
         {
@@ -249,14 +253,14 @@ public class FlashcardQuizPage : ContentPage
                 }
             }
         }
-        .Bind<Border, FlashcardQuizViewModel, bool, Color>(
-            VisualElement.BackgroundColorProperty,
-            getter: isSelectedSelector,
-            convert: selected => selected ? activeColor : Colors.White)
-        .Bind<Border, FlashcardQuizViewModel, bool, Brush>(
+        .Bind<Border, FlashcardQuizViewModel, bool?, Color>(
+            BackgroundColorProperty,
+            getter: knownSelector,
+            convert: selected => selected == expectedValue ? activeColor : Colors.White)
+        .Bind<Border, FlashcardQuizViewModel, bool?, Brush>(
             Border.StrokeProperty,
-            getter: isSelectedSelector,
-            convert: selected => selected ? activeColor : Color.FromArgb("#CBD5E1"));
+            getter: knownSelector,
+            convert: selected => selected == expectedValue ? activeColor : Color.FromArgb("#CBD5E1"));
     }
 
     private static Grid CreateReviewItemCard() =>

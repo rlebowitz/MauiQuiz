@@ -8,7 +8,7 @@ public partial class SelectViewModel : QuizViewModelBase<Question, SummaryItem>
 {
     public SelectViewModel() => InitializeQuiz();
     public override bool IsNextEnabled =>   CurrentItem.Options.Any(o => o.IsSelected) == true;
-    protected override IEnumerable<Question> CreateQuizItems()
+    protected override List<Question> CreateQuizItems()
     {
         return 
         [

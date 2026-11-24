@@ -103,10 +103,10 @@ public class OrderingQuizPage : ContentPage
     private static Grid CreateStepCard(OrderingQuizViewModel viewModel)
     {
         var upTap = new TapGestureRecognizer { Command = viewModel.MoveUpCommand };
-        upTap.Bind(TapGestureRecognizer.CommandParameterProperty, static (OrderStepItem step) => step);
+        upTap.Bind(TapGestureRecognizer.CommandParameterProperty, ".");
 
         var downTap = new TapGestureRecognizer { Command = viewModel.MoveDownCommand };
-        downTap.Bind(TapGestureRecognizer.CommandParameterProperty, static (OrderStepItem step) => step);
+        downTap.Bind(TapGestureRecognizer.CommandParameterProperty, ".");
 
         return new Grid
         {

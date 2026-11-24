@@ -10,7 +10,7 @@ public partial class OrderingQuizViewModel : QuizViewModelBase<OrderingQuestion,
     // Users can submit as soon as they are satisfied with the order
     public override bool IsNextEnabled => CurrentItem?.Steps.Count > 0;
 
-    protected override IEnumerable<OrderingQuestion> CreateQuizItems()
+    protected override List<OrderingQuestion> CreateQuizItems()
     {
         var questions = new List<OrderingQuestion>
         {

@@ -8,7 +8,7 @@ public partial class MatchingQuizViewModel : QuizViewModelBase<MatchingRound, Ma
     public MatchingQuizViewModel() => InitializeQuiz();
     public override bool IsNextEnabled =>
              CurrentItem?.Prompts.All(p => p.IsMatched) == true;
-    protected override IEnumerable<MatchingRound> CreateQuizItems()
+    protected override List<MatchingRound> CreateQuizItems()
     {
         return
         [

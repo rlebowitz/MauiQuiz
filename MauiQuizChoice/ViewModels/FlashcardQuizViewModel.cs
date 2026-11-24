@@ -9,7 +9,7 @@ public partial class FlashcardQuizViewModel : QuizViewModelBase<FlashcardItem, F
 
     public override bool IsNextEnabled => CurrentItem?.Known is not null;
 
-    protected override IEnumerable<FlashcardItem> CreateQuizItems() =>
+    protected override List<FlashcardItem> CreateQuizItems() =>
     [
         new()
         {

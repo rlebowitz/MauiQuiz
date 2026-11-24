@@ -9,7 +9,7 @@ public partial class FillInQuizViewModel : QuizViewModelBase<FillInQuestion, Fil
     public override bool IsNextEnabled =>
         !string.IsNullOrWhiteSpace(CurrentItem?.UserInput);
 
-    protected override IEnumerable<FillInQuestion> CreateQuizItems()
+    protected override List<FillInQuestion> CreateQuizItems()
     {
         return
         [
