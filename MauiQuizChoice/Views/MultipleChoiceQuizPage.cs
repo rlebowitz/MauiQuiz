@@ -7,9 +7,9 @@ using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 
 namespace MauiQuizChoice.Views;
 
-public class SelectQuizPage : ContentPage
+public class MultipleChoiceQuizPage : ContentPage
 {
-    public SelectQuizPage()
+    public MultipleChoiceQuizPage()
     {
         var viewModel = new SelectViewModel();
         BindingContext = viewModel;
@@ -192,10 +192,10 @@ public class SelectQuizPage : ContentPage
         };
     }
 
-    private static Grid BuildAnalyzingOverlay() =>
+    private static AnalyzingOverlayView BuildAnalyzingOverlay() =>
         new AnalyzingOverlayView().Bind(IsVisibleProperty, static (SelectViewModel vm) => vm.IsAnalyzing);
 
-    private static Grid BuildSummaryView(SelectViewModel viewModel) =>
+    private static QuizSummaryView BuildSummaryView(SelectViewModel viewModel) =>
        new QuizSummaryView
        {
            Title = "Multiple Choice Results",
@@ -210,8 +210,8 @@ public class SelectQuizPage : ContentPage
         .Bind(QuizSummaryView.ItemsSourceProperty, static (SelectViewModel vm) => vm.ReviewResults);
 
 
-    private static View CreateSummaryItemCard() =>
-        new Grid
+    private static Grid CreateSummaryItemCard() =>
+        new()
         {
             Padding = new Thickness(0, 6),
             Children =

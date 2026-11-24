@@ -25,7 +25,7 @@ public partial class HomeViewModel : ObservableObject
             IconGlyph: "☰",
             IconBackgroundHex: "#EEF2FF",
             IconTextHex: "#6B66F6",
-            TargetRoute: nameof(SelectQuizPage)),
+            TargetRoute: nameof(MultipleChoiceQuizPage)),
 
         new QuizModeCard(
             Title: "Matching Items",
