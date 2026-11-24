@@ -100,7 +100,7 @@ public class OrderingQuizPage : ContentPage
         };
     }
 
-    private static View CreateStepCard(OrderingQuizViewModel viewModel)
+    private static Grid CreateStepCard(OrderingQuizViewModel viewModel)
     {
         var upTap = new TapGestureRecognizer { Command = viewModel.MoveUpCommand };
         upTap.Bind(TapGestureRecognizer.CommandParameterProperty, static (OrderStepItem step) => step);
@@ -195,8 +195,8 @@ public class OrderingQuizPage : ContentPage
         };
     }
 
-    private static View CreateReviewItemCard() =>
-        new Grid
+    private static Grid CreateReviewItemCard() =>
+        new()
         {
             Padding = new Thickness(0, 6),
             Children =

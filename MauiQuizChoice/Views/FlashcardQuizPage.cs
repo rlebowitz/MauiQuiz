@@ -45,7 +45,7 @@ public class FlashcardQuizPage : ContentPage
     }
 
     private Grid BuildMainQuizView(FlashcardQuizViewModel viewModel) =>
-        new Grid
+        new()
         {
             RowDefinitions = Rows.Define(220, Star, Auto),
             Children =
@@ -129,7 +129,7 @@ public class FlashcardQuizPage : ContentPage
             StrokeShape = new RoundRectangle { CornerRadius = 18 }
         }
         .Bind<Border, FlashcardQuizViewModel, bool, Color>(
-            VisualElement.BackgroundColorProperty,
+            BackgroundColorProperty,
             getter: static vm => vm.CurrentItem.IsFlipped,
             convert: static (bool flipped) => flipped ? Color.FromArgb("#EFF6FF") : Colors.White)
         .Bind<Border, FlashcardQuizViewModel, bool, Brush>(
@@ -204,10 +204,10 @@ public class FlashcardQuizPage : ContentPage
                 return;
 
             _isFlipping = true;
-            await card.RotateYTo(90, 140, Easing.CubicIn);
+            await card.RotateYToAsync(90, 140, Easing.CubicIn);
             viewModel.CurrentItem.IsFlipped = !viewModel.CurrentItem.IsFlipped;
             card.RotationY = -90;
-            await card.RotateYTo(0, 140, Easing.CubicOut);
+            await card.RotateYToAsync(0, 140, Easing.CubicOut);
             _isFlipping = false;
         };
         card.GestureRecognizers.Add(tap);
@@ -259,8 +259,8 @@ public class FlashcardQuizPage : ContentPage
             convert: selected => selected ? activeColor : Color.FromArgb("#CBD5E1"));
     }
 
-    private static View CreateReviewItemCard() =>
-        new Grid
+    private static Grid CreateReviewItemCard() =>
+        new()
         {
             Padding = new Thickness(0, 6),
             Children =

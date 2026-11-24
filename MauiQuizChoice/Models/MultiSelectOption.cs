@@ -9,11 +9,11 @@ public partial class MultiSelectOption : ObservableObject
     public bool IsCorrectOption { get; set; }
 
     [ObservableProperty]
-    private bool _isSelected;
+    public partial bool IsSelected { get; set; }
 }
 
 public class MultiSelectQuestion
 {
     public string Text { get; set; } = string.Empty;
-    public ObservableCollection<MultiSelectOption> Options { get; set; } = new();
+    public ObservableCollection<MultiSelectOption> Options { get; set; } = [];
 }

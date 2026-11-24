@@ -74,7 +74,7 @@ public class HomePage : ContentPage
         };
     }
 
-    private static View CreateQuizModeCard(HomeViewModel viewModel)
+    private static Grid CreateQuizModeCard(HomeViewModel viewModel)
     {
         var tapGesture = new TapGestureRecognizer
         {
