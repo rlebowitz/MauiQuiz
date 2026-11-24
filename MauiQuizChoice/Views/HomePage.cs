@@ -1,5 +1,7 @@
-﻿using CommunityToolkit.Maui.Markup;
+﻿using System.Globalization;
+using CommunityToolkit.Maui.Markup;
 using MauiQuizChoice.Controls;
+using MauiQuizChoice.Resources.Strings;
 using MauiQuizChoice.ViewModels;
 using Microsoft.Maui.Controls.Shapes;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
@@ -13,6 +15,9 @@ public class HomePage : ContentPage
         var viewModel = new HomeViewModel();
         BindingContext = viewModel;
 
+        bool isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+        FlowDirection = isRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+
         Shell.SetNavBarIsVisible(this, false);
         BackgroundColor = Color.FromArgb("#F8F9FB");
 
@@ -23,11 +28,18 @@ public class HomePage : ContentPage
             {
                 new CurvedHeaderBackground().Row(0),
 
+                // Top-End Language Toggle Pill ("עברית" / "English")
+                CreateLanguageTogglePill(isRtl)
+                    .Row(0)
+                    .Top()
+                    .End()
+                    .Margins(top: 16, left: 20, right: 20),
+
                 // Header Branding & Greeting
                 new VerticalStackLayout
                 {
                     Spacing = 10,
-                    Padding = new Thickness(28, 16, 28, 24),
+                    Padding = new Thickness(28, 24, 28, 24),
                     Children =
                     {
                         new Border
@@ -46,7 +58,7 @@ public class HomePage : ContentPage
 
                         new Label
                         {
-                            Text = "Knowledge Check",
+                            Text = AppResources.HomeTitle,
                             TextColor = Colors.White,
                             FontSize = 24,
                             FontAttributes = FontAttributes.Bold
@@ -54,7 +66,7 @@ public class HomePage : ContentPage
 
                         new Label
                         {
-                            Text = "Choose a quiz format below to begin",
+                            Text = AppResources.HomeSubtitle,
                             TextColor = Color.FromArgb("#E0E7FF"),
                             FontSize = 14
                         }.TextCenterHorizontal()
@@ -74,12 +86,63 @@ public class HomePage : ContentPage
         };
     }
 
+    private static Border CreateLanguageTogglePill(bool isCurrentlyHebrew)
+    {
+        var tapGesture = new TapGestureRecognizer();
+        tapGesture.Tapped += (_, _) =>
+        {
+            string nextCulture = isCurrentlyHebrew ? "en" : "he";
+            SetLanguage(nextCulture);
+        };
+
+        return new Border
+        {
+            BackgroundColor = Color.FromArgb("#5752D8"),
+            Stroke = Color.FromArgb("#818CF8"),
+            StrokeThickness = 1,
+            Padding = new Thickness(12, 6),
+            StrokeShape = new RoundRectangle { CornerRadius = 14 },
+            GestureRecognizers = { tapGesture },
+            Content = new HorizontalStackLayout
+            {
+                Spacing = 6,
+                Children =
+                {
+                    new Label
+                    {
+                        Text = "🌐",
+                        FontSize = 12
+                    }.CenterVertical(),
+
+                    new Label
+                    {
+                        Text = AppResources.LanguageToggleLabel,
+                        TextColor = Colors.White,
+                        FontSize = 12,
+                        FontAttributes = FontAttributes.Bold
+                    }.CenterVertical()
+                }
+            }
+        };
+    }
+
+    private static void SetLanguage(string cultureCode)
+    {
+        var culture = new CultureInfo(cultureCode);
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
+        Thread.CurrentThread.CurrentCulture = culture;
+        Thread.CurrentThread.CurrentUICulture = culture;
+
+        if (Application.Current?.Windows.Count > 0)
+        {
+            Application.Current.Windows[0].Page = new AppShell();
+        }
+    }
+
     private static Grid CreateQuizModeCard(HomeViewModel viewModel)
     {
-        var tapGesture = new TapGestureRecognizer
-        {
-            Command = viewModel.LaunchQuizCommand
-        };
+        var tapGesture = new TapGestureRecognizer { Command = viewModel.LaunchQuizCommand };
         tapGesture.Bind(TapGestureRecognizer.CommandParameterProperty, ".");
 
         return new Grid
@@ -163,10 +226,10 @@ public class HomePage : ContentPage
                                 }
                             }.Column(1).CenterVertical(),
 
-                            // Right Launch Chevron
+                            // Right Launch Chevron (mirrors automatically in RTL)
                             new Label
                             {
-                                Text = "›",
+                                Text = isRtlChevron(),
                                 TextColor = Color.FromArgb("#4FA8F6"),
                                 FontSize = 26,
                                 FontAttributes = FontAttributes.Bold
@@ -177,4 +240,7 @@ public class HomePage : ContentPage
             }
         };
     }
+
+    private static string isRtlChevron() =>
+        CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft ? "‹" : "›";
 }

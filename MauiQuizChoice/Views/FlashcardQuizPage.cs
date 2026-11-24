@@ -1,7 +1,9 @@
-﻿using System.Linq.Expressions;
+﻿using System.Globalization;
+using System.Linq.Expressions;
 using CommunityToolkit.Maui.Markup;
 using MauiQuizChoice.Controls;
 using MauiQuizChoice.Models;
+using MauiQuizChoice.Resources.Strings;
 using MauiQuizChoice.ViewModels;
 using Microsoft.Maui.Controls.Shapes;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
@@ -17,6 +19,11 @@ public class FlashcardQuizPage : ContentPage
         var viewModel = new FlashcardQuizViewModel();
         BindingContext = viewModel;
 
+        // Automatically mirror layout for Hebrew (RTL) vs. English (LTR)
+        FlowDirection = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft
+            ? FlowDirection.RightToLeft
+            : FlowDirection.LeftToRight;
+
         Shell.SetNavBarIsVisible(this, false);
         BackgroundColor = Color.FromArgb("#F8F9FB");
 
@@ -31,8 +38,8 @@ public class FlashcardQuizPage : ContentPage
 
                 new QuizSummaryView
                 {
-                    Title = "Flashcard Results",
-                    RetakeButtonText = "Study Again",
+                    Title = AppResources.FlashcardResultsTitle,
+                    RetakeButtonText = AppResources.StudyAgainText,
                     RetakeCommand = viewModel.RestartCommand,
                     GoHomeCommand = viewModel.GoHomeCommand,
                     ItemTemplate = new DataTemplate(CreateReviewItemCard)
@@ -64,14 +71,18 @@ public class FlashcardQuizPage : ContentPage
                             GoHomeCommand = viewModel.GoHomeCommand
                         }.Bind(QuizTopNavBar.CanGoBackProperty, static (FlashcardQuizViewModel vm) => vm.CanGoBack),
 
-                        new CircularProgressView()
-                            .CenterHorizontal()
-                            .Bind(CircularProgressView.ProgressProperty, static (FlashcardQuizViewModel vm) => vm.ProgressValue)
-                            .Bind(CircularProgressView.TextProperty, static (FlashcardQuizViewModel vm) => vm.ProgressText),
+                        // Keep progress ring locked to LTR even when the page is RTL
+                        new CircularProgressView
+                        {
+                            FlowDirection = FlowDirection.LeftToRight
+                        }
+                        .CenterHorizontal()
+                        .Bind(CircularProgressView.ProgressProperty, static (FlashcardQuizViewModel vm) => vm.ProgressValue)
+                        .Bind(CircularProgressView.TextProperty, static (FlashcardQuizViewModel vm) => vm.ProgressText),
 
                         new Label
                         {
-                            Text = "Tap the card to flip",
+                            Text = AppResources.TapCardToFlipHint,
                             TextColor = Color.FromArgb("#E0E7FF"),
                             FontSize = 14
                         }.CenterHorizontal()
@@ -95,7 +106,7 @@ public class FlashcardQuizPage : ContentPage
                             {
                                 CreateAssessmentButton(
                                     viewModel: viewModel,
-                                    text: "Needs Review",
+                                    text: AppResources.NeedsReviewButtonText,
                                     knownValue: false,
                                     activeColor: Color.FromArgb("#F59E0B"),
                                     knownSelector: static vm => vm.CurrentItem.Known,
@@ -104,7 +115,7 @@ public class FlashcardQuizPage : ContentPage
 
                                 CreateAssessmentButton(
                                     viewModel: viewModel,
-                                    text: "Got It",
+                                    text: AppResources.GotItButtonText,
                                     knownValue: true,
                                     activeColor: Color.FromArgb("#16A34A"),
                                     knownSelector: static vm => vm.CurrentItem.Known,
@@ -115,9 +126,13 @@ public class FlashcardQuizPage : ContentPage
                     }
                 }.Row(1).CenterVertical(),
 
-                new QuizNextButton { Command = viewModel.NextCommand }
-                    .Row(2)
-                    .Bind(IsEnabledProperty, static (FlashcardQuizViewModel vm) => vm.IsNextEnabled)
+                new QuizNextButton
+                {
+                    Text = AppResources.NextButtonText,
+                    Command = viewModel.NextCommand
+                }
+                .Row(2)
+                .Bind(IsEnabledProperty, static (FlashcardQuizViewModel vm) => vm.IsNextEnabled)
             }
         };
 
@@ -133,11 +148,11 @@ public class FlashcardQuizPage : ContentPage
         .Bind<Border, FlashcardQuizViewModel, bool, Color>(
             BackgroundColorProperty,
             getter: static vm => vm.CurrentItem.IsFlipped,
-            convert: static (bool flipped) => flipped ? Color.FromArgb("#EFF6FF") : Colors.White)
+            convert: static flipped => flipped ? Color.FromArgb("#EFF6FF") : Colors.White)
         .Bind<Border, FlashcardQuizViewModel, bool, Brush>(
             Border.StrokeProperty,
             getter: static vm => vm.CurrentItem.IsFlipped,
-            convert: static (bool flipped) => flipped ? Color.FromArgb("#4FA8F6") : Color.FromArgb("#E2E8F0"));
+            convert: static flipped => flipped ? Color.FromArgb("#4FA8F6") : Color.FromArgb("#E2E8F0"));
 
         var frontContent = new VerticalStackLayout
         {
@@ -146,7 +161,7 @@ public class FlashcardQuizPage : ContentPage
             {
                 new Label
                 {
-                    Text = "QUESTION",
+                    Text = AppResources.FlashcardQuestionLabel,
                     TextColor = Color.FromArgb("#6B66F6"),
                     FontSize = 11,
                     FontAttributes = FontAttributes.Bold,
@@ -168,7 +183,7 @@ public class FlashcardQuizPage : ContentPage
         .Bind(
             IsVisibleProperty,
             static (FlashcardQuizViewModel vm) => vm.CurrentItem.IsFlipped,
-            convert: static (bool flipped) => !flipped);
+            convert: static flipped => !flipped);
 
         var backContent = new VerticalStackLayout
         {
@@ -177,7 +192,7 @@ public class FlashcardQuizPage : ContentPage
             {
                 new Label
                 {
-                    Text = "ANSWER",
+                    Text = AppResources.FlashcardAnswerLabel,
                     TextColor = Color.FromArgb("#4FA8F6"),
                     FontSize = 11,
                     FontAttributes = FontAttributes.Bold,
@@ -224,7 +239,6 @@ public class FlashcardQuizPage : ContentPage
         Color activeColor,
         Expression<Func<FlashcardQuizViewModel, bool?>> knownSelector,
         bool expectedValue)
-
     {
         var label = new Label
         {
@@ -303,7 +317,7 @@ public class FlashcardQuizPage : ContentPage
                             .Bind<Label, FlashcardReviewItem, bool, Color>(
                                 Label.TextColorProperty,
                                 getter: static item => item.Known,
-                                convert: static (bool known) => known ? Color.FromArgb("#16A34A") : Color.FromArgb("#D97706"))
+                                convert: static known => known ? Color.FromArgb("#16A34A") : Color.FromArgb("#D97706"))
                         }
                     }
                 }

@@ -1,6 +1,8 @@
-﻿using CommunityToolkit.Maui.Markup;
+﻿using System.Globalization;
+using CommunityToolkit.Maui.Markup;
 using MauiQuizChoice.Controls;
 using MauiQuizChoice.Models;
+using MauiQuizChoice.Resources.Strings;
 using MauiQuizChoice.ViewModels;
 using Microsoft.Maui.Controls.Shapes;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
@@ -13,6 +15,11 @@ public class FillInQuizPage : ContentPage
     {
         var viewModel = new FillInQuizViewModel();
         BindingContext = viewModel;
+
+        // Automatically mirror layout for Hebrew (RTL) vs. English (LTR)
+        FlowDirection = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft
+            ? FlowDirection.RightToLeft
+            : FlowDirection.LeftToRight;
 
         Shell.SetNavBarIsVisible(this, false);
         BackgroundColor = Color.FromArgb("#F8F9FB");
@@ -30,17 +37,15 @@ public class FillInQuizPage : ContentPage
 
     private static Grid BuildMainQuizView(FillInQuizViewModel viewModel)
     {
-        // Input border with DataTrigger equivalent
+        // Input border with strongly-typed expression bindings
         var inputBorder = new Border
         {
             BackgroundColor = Colors.White,
-            Stroke = Color.FromArgb("#E2E8F0"),
-            StrokeThickness = 1.5,
             Padding = new Thickness(16, 10),
             StrokeShape = new RoundRectangle { CornerRadius = 12 },
             Content = new Entry
             {
-                Placeholder = "Type your answer here...",
+                Placeholder = AppResources.FillInAnswerPlaceholder,
                 PlaceholderColor = Color.FromArgb("#94A3B8"),
                 TextColor = Color.FromArgb("#2D3748"),
                 FontSize = 16,
@@ -48,42 +53,15 @@ public class FillInQuizPage : ContentPage
                 ReturnType = ReturnType.Next,
                 ReturnCommand = viewModel.NextCommand
             }.Bind(Entry.TextProperty, static (FillInQuizViewModel vm) => vm.CurrentItem.UserInput)
-        };
-
-        inputBorder.Triggers.Add(new DataTrigger(typeof(Border))
-        {
-            Binding = new Binding(nameof(FillInQuizViewModel.IsNextEnabled)),
-            Value = true,
-            Setters =
-            {
-                new Setter { Property = Border.StrokeProperty, Value = Color.FromArgb("#4FA8F6") },
-                new Setter { Property = Border.StrokeThicknessProperty, Value = 2.0 }
-            }
-        });
-
-        // Next button with DataTrigger equivalent
-        var nextButton = new Button
-        {
-            Text = "Next",
-            Command = viewModel.NextCommand,
-            HeightRequest = 52,
-            CornerRadius = 26,
-            FontSize = 16,
-            FontAttributes = FontAttributes.Bold,
-            TextColor = Colors.White,
-            BackgroundColor = Color.FromArgb("#D1D5DB"),
-            Margin = new Thickness(24, 10, 24, 36)
-        }.Row(2);
-
-        nextButton.Triggers.Add(new DataTrigger(typeof(Button))
-        {
-            Binding = new Binding(nameof(FillInQuizViewModel.IsNextEnabled)),
-            Value = true,
-            Setters =
-            {
-                new Setter { Property = BackgroundColorProperty, Value = Color.FromArgb("#4FA8F6") }
-            }
-        });
+        }
+        .Bind<Border, FillInQuizViewModel, bool, Brush>(
+            Border.StrokeProperty,
+            getter: static vm => vm.IsNextEnabled,
+            convert: static enabled => enabled ? Color.FromArgb("#4FA8F6") : Color.FromArgb("#E2E8F0"))
+        .Bind<Border, FillInQuizViewModel, bool, double>(
+            Border.StrokeThicknessProperty,
+            getter: static vm => vm.IsNextEnabled,
+            convert: static enabled => enabled ? 2.0 : 1.5);
 
         return new Grid
         {
@@ -105,12 +83,16 @@ public class FillInQuizPage : ContentPage
                             GoHomeCommand = viewModel.GoHomeCommand
                         }.Bind(QuizTopNavBar.CanGoBackProperty, static (FillInQuizViewModel vm) => vm.CanGoBack),
 
-                        new CircularProgressView()
-                            .CenterHorizontal()
-                            .Bind(CircularProgressView.ProgressProperty, static (FillInQuizViewModel vm) => vm.ProgressValue)
-                            .Bind(CircularProgressView.TextProperty, static (FillInQuizViewModel vm) => vm.ProgressText),
+                        // Keep progress ring locked to LTR even when the page is RTL
+                        new CircularProgressView
+                        {
+                            FlowDirection = FlowDirection.LeftToRight
+                        }
+                        .CenterHorizontal()
+                        .Bind(CircularProgressView.ProgressProperty, static (FillInQuizViewModel vm) => vm.ProgressValue)
+                        .Bind(CircularProgressView.TextProperty, static (FillInQuizViewModel vm) => vm.ProgressText),
 
-                        // Formatted Sentence with Inline Blank
+                        // Formatted Sentence with Inline Blank (flows RTL automatically in Hebrew)
                         new Label
                         {
                             LineBreakMode = LineBreakMode.WordWrap,
@@ -166,13 +148,19 @@ public class FillInQuizPage : ContentPage
                             }.Bind(
                                 Label.TextProperty,
                                 static (FillInQuizViewModel vm) => vm.CurrentItem.Hint,
-                                stringFormat: "Hint: {0}")
+                                stringFormat: AppResources.FillInHintFormat)
                         }.Start()
                     }
                 }.Row(1).Top(),
 
-                // Bottom "Next" Pill Button
-                nextButton
+                // Bottom "Next" / "הבא" Pill Button
+                new QuizNextButton
+                {
+                    Text = AppResources.NextButtonText,
+                    Command = viewModel.NextCommand
+                }
+                .Row(2)
+                .Bind(IsEnabledProperty, static (FillInQuizViewModel vm) => vm.IsNextEnabled)
             }
         };
     }
@@ -182,9 +170,10 @@ public class FillInQuizPage : ContentPage
             .Bind(IsVisibleProperty, static (FillInQuizViewModel vm) => vm.IsAnalyzing);
 
     private static QuizSummaryView BuildSummaryView(FillInQuizViewModel viewModel) =>
-        new QuizSummaryView {
-            Title = "Fill-in-the-Blank Results",
-            RetakeButtonText = "Retake Quiz",
+        new QuizSummaryView
+        {
+            Title = AppResources.FillInResultsTitle,
+            RetakeButtonText = AppResources.RetakeQuizText,
             RetakeCommand = viewModel.RestartCommand,
             GoHomeCommand = viewModel.GoHomeCommand,
             ItemTemplate = new DataTemplate(CreateReviewItemCard)
@@ -194,7 +183,7 @@ public class FillInQuizPage : ContentPage
         .Bind(QuizSummaryView.ItemsSourceProperty, static (FillInQuizViewModel vm) => vm.ReviewResults);
 
     private static Grid CreateReviewItemCard() =>
-        new Grid
+        new()
         {
             Padding = new Thickness(0, 6),
             Children =
@@ -225,7 +214,7 @@ public class FillInQuizPage : ContentPage
                             }.Bind(
                                 Label.TextProperty,
                                 static (FillInReviewItem item) => item.UserAnswer,
-                                stringFormat: "Your answer: {0}"),
+                                stringFormat: AppResources.FillInYourAnswerFormat),
 
                             new Label
                             {
@@ -235,11 +224,11 @@ public class FillInQuizPage : ContentPage
                             .Bind(
                                 Label.TextProperty,
                                 static (FillInReviewItem item) => item.CorrectAnswer,
-                                stringFormat: "Expected: {0}")
+                                stringFormat: AppResources.FillInExpectedFormat)
                             .Bind(
                                 IsVisibleProperty,
                                 static (FillInReviewItem item) => item.IsCorrect,
-                                convert: static (bool isCorrect) => !isCorrect)
+                                convert: static isCorrect => !isCorrect)
                         }
                     }
                 }

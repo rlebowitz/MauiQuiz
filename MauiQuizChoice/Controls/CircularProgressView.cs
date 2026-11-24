@@ -12,6 +12,7 @@ public partial class CircularProgressView : GraphicsView, IDrawable
     public partial string Text { get; set; } = string.Empty;
     public CircularProgressView()
     {
+        FlowDirection = FlowDirection.LeftToRight;  // Ensure consistent rendering of the progress arc and text, regardless of the page's FlowDirection
         Drawable = this;
         WidthRequest = 48;
         HeightRequest = 48;

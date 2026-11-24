@@ -13,6 +13,7 @@ public partial class QuizTopNavBar : Grid
     public partial ICommand? GoHomeCommand { get; set; }
     [BindableProperty]
     public partial bool CanGoBack { get; set; } = false;
+    bool isRtl = System.Globalization.CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
 
     public QuizTopNavBar()
     {
@@ -27,9 +28,13 @@ public partial class QuizTopNavBar : Grid
             BackgroundColor = Colors.Transparent,
             StrokeThickness = 0,
             GestureRecognizers = { backTap },
+            // In QuizTopNavBar.cs:
+            // When FlowDirection is RightToLeft, Column 0 automatically renders on the right
+            // and Column 2 automatically renders on the left.
+            // Swap the arrow glyph based on FlowDirection or CultureInfo:
             Content = new Label
             {
-                Text = "←",
+                Text = isRtl ? "→" : "←",
                 TextColor = Colors.White,
                 FontSize = 22
             }.Start().CenterVertical()

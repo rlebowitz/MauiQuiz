@@ -1,6 +1,8 @@
-﻿using CommunityToolkit.Maui.Markup;
+﻿using System.Globalization;
+using CommunityToolkit.Maui.Markup;
 using MauiQuizChoice.Controls;
 using MauiQuizChoice.Models;
+using MauiQuizChoice.Resources.Strings;
 using MauiQuizChoice.ViewModels;
 using Microsoft.Maui.Controls.Shapes;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
@@ -13,6 +15,11 @@ public class MultipleChoiceQuizPage : ContentPage
     {
         var viewModel = new SelectViewModel();
         BindingContext = viewModel;
+
+        // Automatically switch layout direction between LTR (English) and RTL (Hebrew)
+        FlowDirection = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft
+            ? FlowDirection.RightToLeft
+            : FlowDirection.LeftToRight;
 
         Shell.SetNavBarIsVisible(this, false);
         BackgroundColor = Color.FromArgb("#F8F9FB");
@@ -28,32 +35,8 @@ public class MultipleChoiceQuizPage : ContentPage
         };
     }
 
-    private static Grid BuildMainQuizView(SelectViewModel viewModel)
-    {
-        var nextButton = new Button
-        {
-            Text = "Next",
-            Command = viewModel.NextCommand,
-            HeightRequest = 52,
-            CornerRadius = 26,
-            FontSize = 16,
-            FontAttributes = FontAttributes.Bold,
-            TextColor = Colors.White,
-            BackgroundColor = Color.FromArgb("#D1D5DB"),
-            Margin = new Thickness(24, 10, 24, 36)
-        }.Row(2);
-
-        nextButton.Triggers.Add(new DataTrigger(typeof(Button))
-        {
-            Binding = new Binding(nameof(SelectViewModel.IsNextEnabled)),
-            Value = true,
-            Setters =
-            {
-                new Setter { Property = VisualElement.BackgroundColorProperty, Value = Color.FromArgb("#4FA8F6") }
-            }
-        });
-
-        return new Grid
+    private static Grid BuildMainQuizView(SelectViewModel viewModel) =>
+        new Grid
         {
             RowDefinitions = Rows.Define(250, Star, Auto),
             Children =
@@ -67,20 +50,17 @@ public class MultipleChoiceQuizPage : ContentPage
                     Spacing = 14,
                     Children =
                     {
-                        // Top Navigation Bar
                         new QuizTopNavBar
                         {
                             PreviousCommand = viewModel.PreviousCommand,
                             GoHomeCommand = viewModel.GoHomeCommand
                         }.Bind(QuizTopNavBar.CanGoBackProperty, static (SelectViewModel vm) => vm.CanGoBack),
 
-                        // Animated Circular Progress Indicator
                         new CircularProgressView()
                             .CenterHorizontal()
                             .Bind(CircularProgressView.ProgressProperty, static (SelectViewModel vm) => vm.ProgressValue)
                             .Bind(CircularProgressView.TextProperty, static (SelectViewModel vm) => vm.ProgressText),
 
-                        // Question Text
                         new Label
                         {
                             TextColor = Colors.White,
@@ -103,18 +83,20 @@ public class MultipleChoiceQuizPage : ContentPage
                 .Row(1)
                 .Bind(ItemsView.ItemsSourceProperty, static (SelectViewModel vm) => vm.CurrentItem.Options),
 
-                // Bottom "Next" Pill Button
-               new QuizNextButton{Command = viewModel.NextCommand}.Row(2).Bind(IsEnabledProperty, static (SelectViewModel vm) => vm.IsNextEnabled)
+                // Bottom "Next" / "הבא" Pill Button
+                new QuizNextButton
+                {
+                    Text = AppResources.NextButtonText,
+                    Command = viewModel.NextCommand
+                }
+                .Row(2)
+                .Bind(IsEnabledProperty, static (SelectViewModel vm) => vm.IsNextEnabled)
             }
         };
-    }
 
     private static Grid CreateOptionCard(SelectViewModel viewModel)
     {
-        var tapGesture = new TapGestureRecognizer
-        {
-            Command = viewModel.SelectOptionCommand
-        };
+        var tapGesture = new TapGestureRecognizer { Command = viewModel.SelectOptionCommand };
         tapGesture.Bind(TapGestureRecognizer.CommandParameterProperty, ".");
 
         var radioCircle = new Border
@@ -157,13 +139,16 @@ public class MultipleChoiceQuizPage : ContentPage
             GestureRecognizers = { tapGesture },
             Content = new Grid
             {
+                // Column 0 (Text) and Column 1 (Radio Circle) mirror automatically in RTL
                 ColumnDefinitions = Columns.Define(Star, Auto),
+                ColumnSpacing = 12,
                 Children =
                 {
                     new Label
                     {
                         TextColor = Color.FromArgb("#2D3748"),
-                        FontSize = 15
+                        FontSize = 15,
+                        LineBreakMode = LineBreakMode.WordWrap
                     }
                     .Column(0)
                     .CenterVertical()
@@ -185,30 +170,25 @@ public class MultipleChoiceQuizPage : ContentPage
             }
         });
 
-        return new Grid
-        {
-            Padding = new Thickness(0, 6),
-            Children = { card }
-        };
+        return new Grid { Padding = new Thickness(0, 6), Children = { card } };
     }
 
     private static AnalyzingOverlayView BuildAnalyzingOverlay() =>
-        new AnalyzingOverlayView().Bind(IsVisibleProperty, static (SelectViewModel vm) => vm.IsAnalyzing);
+        new AnalyzingOverlayView()
+            .Bind(IsVisibleProperty, static (SelectViewModel vm) => vm.IsAnalyzing);
 
     private static QuizSummaryView BuildSummaryView(SelectViewModel viewModel) =>
-       new QuizSummaryView
-       {
-           Title = "Multiple Choice Results",
-           RetakeButtonText = "Retake Quiz",
-           RetakeCommand = viewModel.RestartCommand,
-           GoHomeCommand = viewModel.GoHomeCommand,
-           ItemTemplate = new DataTemplate(CreateSummaryItemCard)
-
-       }
-       .Bind(IsVisibleProperty, static (SelectViewModel vm) => vm.IsSummaryVisible)
+        new QuizSummaryView
+        {
+            Title = AppResources.MultipleChoiceResultsTitle,
+            RetakeButtonText = AppResources.RetakeQuizText,
+            RetakeCommand = viewModel.RestartCommand,
+            GoHomeCommand = viewModel.GoHomeCommand,
+            ItemTemplate = new DataTemplate(CreateSummaryItemCard)
+        }
+        .Bind(IsVisibleProperty, static (SelectViewModel vm) => vm.IsSummaryVisible)
         .Bind(QuizSummaryView.SubtitleProperty, static (SelectViewModel vm) => vm.ScoreSummaryText)
         .Bind(QuizSummaryView.ItemsSourceProperty, static (SelectViewModel vm) => vm.ReviewResults);
-
 
     private static Grid CreateSummaryItemCard() =>
         new()
