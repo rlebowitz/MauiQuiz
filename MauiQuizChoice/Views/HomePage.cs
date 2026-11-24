@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui.Markup;
+using MauiQuizChoice.Controls;
 using MauiQuizChoice.ViewModels;
 using Microsoft.Maui.Controls.Shapes;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
@@ -20,14 +21,7 @@ public class HomePage : ContentPage
             RowDefinitions = Rows.Define(230, Star),
             Children =
             {
-                // Curved Purple Header
-                new Border
-                {
-                    BackgroundColor = Color.FromArgb("#6B66F6"),
-                    StrokeThickness = 0,
-                    Margin = new Thickness(-40, -50, -40, 0),
-                    StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(0, 0, 180, 180) }
-                }.Row(0),
+                new CurvedHeaderBackground().Row(0),
 
                 // Header Branding & Greeting
                 new VerticalStackLayout

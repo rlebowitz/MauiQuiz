@@ -61,7 +61,23 @@ public partial class HomeViewModel : ObservableObject
             IconGlyph: "✎",
             IconBackgroundHex: "#FCE7F3",
             IconTextHex: "#DB2777",
-            TargetRoute: nameof(FillInQuizPage))
+            TargetRoute: nameof(FillInQuizPage)),
+        new QuizModeCard(
+            Title: "Flashcard Flip",
+            Subtitle: "Flip cards to test your recall and self-assess",
+            QuestionCountBadge: "3 CARDS",
+            IconGlyph: "↻",
+            IconBackgroundHex: "#FEF3C7",
+            IconTextHex: "#D97706",
+            TargetRoute: nameof(FlashcardQuizPage)),
+        new QuizModeCard(
+            Title: "Ordering & Sequencing",
+            Subtitle: "Arrange scrambled steps into the proper order",
+            QuestionCountBadge: "2 SEQUENCES",
+            IconGlyph: "⇅",
+            IconBackgroundHex: "#DCFCE7",
+            IconTextHex: "#16A34A",
+            TargetRoute: nameof(OrderingQuizPage))
     ];
 
     [RelayCommand]
