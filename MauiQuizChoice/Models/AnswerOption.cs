@@ -2,7 +2,7 @@
 
 namespace MauiQuizChoice.Models;
 
-public partial class AnswerOption : ObservableObject
+public partial class MultipleChoiceAnswerOption : ObservableObject
 {
     public string Text { get; set; } = string.Empty;
 

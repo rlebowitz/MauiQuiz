@@ -1,4 +1,8 @@
 ﻿namespace MauiQuizChoice.Models;
 
-public record SummaryItem(string QuestionText, string SelectedAnswer);
+public class SummaryItem
+{
 
+    public string QuestionText { get; set; } = string.Empty;
+    public string SelectedAnswer { get; set; } = string.Empty;
+}

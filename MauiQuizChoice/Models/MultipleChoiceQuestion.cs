@@ -2,8 +2,8 @@
 
 namespace MauiQuizChoice.Models;
 
-public class Question
+public class MultipleChoiceQuestion
 {
     public string Text { get; set; } = string.Empty;
-    public ObservableCollection<AnswerOption> Options { get; set; } = [];
+    public ObservableCollection<MultipleChoiceAnswerOption> Options { get; set; } = [];
 }

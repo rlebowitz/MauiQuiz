@@ -47,12 +47,12 @@ public partial class FillInQuizViewModel : QuizViewModelBase<FillInQuestion, Fil
             if (isCorrect) correctCount++;
 
             ReviewResults.Add(new FillInReviewItem
-            (
-                $"{q.PromptBeforeBlank} {q.CorrectAnswer} {q.PromptAfterBlank}",
-                string.IsNullOrEmpty(trimmed) ? "(blank)" : trimmed,
-                q.CorrectAnswer,
-                isCorrect
-            ));
+            {
+                FullSentence = $"{q.PromptBeforeBlank} {q.CorrectAnswer} {q.PromptAfterBlank}",
+                UserAnswer = string.IsNullOrEmpty(trimmed) ? "(blank)" : trimmed,
+                CorrectAnswer = q.CorrectAnswer,
+                IsCorrect = isCorrect
+            });
         }
 
         ScoreSummaryText = $"You scored {correctCount} out of {items.Count}";

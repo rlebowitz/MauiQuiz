@@ -131,14 +131,14 @@ public class MultipleChoiceQuizPage : ContentPage
                 FontAttributes = FontAttributes.Bold
             }
             .Center()
-            .Bind(IsVisibleProperty, static (AnswerOption opt) => opt.IsSelected)
+            .Bind(IsVisibleProperty, static (MultipleChoiceAnswerOption opt) => opt.IsSelected)
         }
         .Column(1)
         .Size(22);
 
         radioCircle.Triggers.Add(new DataTrigger(typeof(Border))
         {
-            Binding = new Binding(nameof(AnswerOption.IsSelected)),
+            Binding = new Binding(nameof(MultipleChoiceAnswerOption.IsSelected)),
             Value = true,
             Setters =
             {
@@ -167,7 +167,7 @@ public class MultipleChoiceQuizPage : ContentPage
                     }
                     .Column(0)
                     .CenterVertical()
-                    .Bind(Label.TextProperty, static (AnswerOption opt) => opt.Text),
+                    .Bind(Label.TextProperty, static (MultipleChoiceAnswerOption opt) => opt.Text),
 
                     radioCircle
                 }
@@ -176,7 +176,7 @@ public class MultipleChoiceQuizPage : ContentPage
 
         card.Triggers.Add(new DataTrigger(typeof(Border))
         {
-            Binding = new Binding(nameof(AnswerOption.IsSelected)),
+            Binding = new Binding(nameof(MultipleChoiceAnswerOption.IsSelected)),
             Value = true,
             Setters =
             {

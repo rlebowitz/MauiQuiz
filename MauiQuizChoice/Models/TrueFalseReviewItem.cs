@@ -1,3 +1,9 @@
 ﻿namespace MauiQuizChoice.Models;
 
-public record TrueFalseReviewItem(string Statement, string UserAnswerText, string CorrectAnswerText, bool IsCorrect);
+public class TrueFalseReviewItem
+{
+    public string Statement { get; set; } = string.Empty;
+    public string UserAnswerText { get; set; } = string.Empty;
+    public string CorrectAnswerText { get; set; } = string.Empty;
+    public bool IsCorrect { get; set; }
+}

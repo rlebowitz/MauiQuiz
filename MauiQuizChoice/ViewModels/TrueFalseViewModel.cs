@@ -56,14 +56,15 @@ public partial class TrueFalseQuizViewModel : QuizViewModelBase<TrueFalseQuestio
             bool userChoice = q.IsTrueSelected;
             bool isCorrect = userChoice == q.CorrectAnswer;
             if (isCorrect) correctCount++;
-            var x = new TrueFalseReviewItem
-            (
-                q.Statement,
-                userChoice ? "True" : "False",
-                q.CorrectAnswer ? "True" : "False",
-                isCorrect
-            );
-            ReviewResults.Add(x);
+            var item = new TrueFalseReviewItem
+            {
+                Statement = q.Statement,
+                UserAnswerText = userChoice ? "True" : "False",
+                CorrectAnswerText = q.CorrectAnswer ? "True" : "False",
+                IsCorrect = isCorrect
+            };
+            
+            ReviewResults.Add(item);
         }
 
         ScoreSummaryText = $"You scored {correctCount} out of {items.Count}";

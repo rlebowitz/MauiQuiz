@@ -75,12 +75,12 @@ public partial class MatchingQuizViewModel : QuizViewModelBase<MatchingRound, Ma
                 bool isCorrect = prompt.PairId == target.PairId;
                 if (isCorrect) correctPairs++;
 
-                var x = new MatchReviewItem(
-                     prompt.Text,
-                     prompt.MatchedTargetText ?? "Unmatched",
-                     target.MatchedBadgeText,
-                     isCorrect
-                 );
+                var x = new MatchReviewItem{
+                     Prompt = prompt.Text,
+                     UserMatch = prompt.MatchedTargetText ?? "Unmatched",
+                     CorrectMatch = target.MatchedBadgeText,
+                     IsCorrect = isCorrect
+                 };
                 ReviewResults.Add(x);
             }
         }

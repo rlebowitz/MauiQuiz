@@ -1,3 +1,9 @@
 ﻿namespace MauiQuizChoice.Models;
 
-public record MatchReviewItem(string Prompt, string UserMatch, string CorrectMatch, bool IsCorrect);
+public class MatchReviewItem
+{
+    public string Prompt { get; set; } = string.Empty;
+    public string UserMatch { get; set; } = string.Empty;
+    public string CorrectMatch { get; set; } = string.Empty;
+    public bool IsCorrect { get; set; }
+}
