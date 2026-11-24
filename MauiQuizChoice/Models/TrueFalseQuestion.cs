@@ -8,10 +8,8 @@ public partial class TrueFalseQuestion : ObservableObject
     public bool CorrectAnswer { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsTrueSelected))]
-    [NotifyPropertyChangedFor(nameof(IsFalseSelected))]
-    public partial bool? SelectedAnswer { get; set; }
+    public partial bool IsTrueSelected { get; set; }
 
-    public bool IsTrueSelected {get { return SelectedAnswer == true; } set { SelectedAnswer = value; } }
-    public bool IsFalseSelected {get { return SelectedAnswer == false; } set { SelectedAnswer = value; } }
+    [ObservableProperty]
+    public partial bool IsFalseSelected { get; set; }
 }

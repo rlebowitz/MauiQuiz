@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui.Markup;
+﻿using System.Linq.Expressions;
+using CommunityToolkit.Maui.Markup;
 using MauiQuizChoice.Controls;
 using MauiQuizChoice.Models;
 using MauiQuizChoice.ViewModels;
@@ -22,38 +23,27 @@ public class TrueFalseQuizPage : ContentPage
             Children =
             {
                 BuildMainQuizView(viewModel),
-                BuildAnalyzingOverlay(),
-                BuildSummaryView(viewModel)
+
+                new AnalyzingOverlayView()
+                    .Bind(IsVisibleProperty, static (TrueFalseQuizViewModel vm) => vm.IsAnalyzing),
+
+                new QuizSummaryView
+                {
+                    Title = "True / False Results",
+                    RetakeButtonText = "Retake Quiz",
+                    RetakeCommand = viewModel.RestartCommand,
+                    GoHomeCommand = viewModel.GoHomeCommand,
+                    ItemTemplate = new DataTemplate(CreateReviewItemCard)
+                }
+                .Bind(IsVisibleProperty, static (TrueFalseQuizViewModel vm) => vm.IsSummaryVisible)
+                .Bind(QuizSummaryView.SubtitleProperty, static (TrueFalseQuizViewModel vm) => vm.ScoreSummaryText)
+                .Bind(QuizSummaryView.ItemsSourceProperty, static (TrueFalseQuizViewModel vm) => vm.ReviewResults)
             }
         };
     }
 
-    private static Grid BuildMainQuizView(TrueFalseQuizViewModel viewModel)
-    {
-        var nextButton = new Button
-        {
-            Text = "Next",
-            Command = viewModel.NextCommand,
-            HeightRequest = 52,
-            CornerRadius = 26,
-            FontSize = 16,
-            FontAttributes = FontAttributes.Bold,
-            TextColor = Colors.White,
-            BackgroundColor = Color.FromArgb("#D1D5DB"),
-            Margin = new Thickness(24, 10, 24, 36)
-        }.Row(2);
-
-        nextButton.Triggers.Add(new DataTrigger(typeof(Button))
-        {
-            Binding = new Binding(nameof(TrueFalseQuizViewModel.IsNextEnabled)),
-            Value = true,
-            Setters =
-            {
-                new Setter { Property = BackgroundColorProperty, Value = Color.FromArgb("#4FA8F6") }
-            }
-        });
-
-        return new Grid
+    private static Grid BuildMainQuizView(TrueFalseQuizViewModel viewModel) =>
+        new Grid
         {
             RowDefinitions = Rows.Define(260, Star, Auto),
             Children =
@@ -103,8 +93,8 @@ public class TrueFalseQuizPage : ContentPage
                             labelText: "True",
                             glyph: "✓",
                             glyphSize: 22,
-                            commandParameter: "True",
-                            selectedBindingPath: $"{nameof(TrueFalseQuizViewModel.CurrentItem)}.IsTrueSelected"
+                            choiceValue: true,
+                            isSelectedSelector: static vm => vm.CurrentItem.IsTrueSelected
                         ).Column(0),
 
                         CreateChoiceCard(
@@ -112,130 +102,96 @@ public class TrueFalseQuizPage : ContentPage
                             labelText: "False",
                             glyph: "✕",
                             glyphSize: 20,
-                            commandParameter: "False",
-                            selectedBindingPath: $"{nameof(TrueFalseQuizViewModel.CurrentItem)}.IsFalseSelected"
+                            choiceValue: false,
+                            isSelectedSelector: static vm => vm.CurrentItem.IsFalseSelected
                         ).Column(1)
                     }
                 }.Row(1).CenterVertical(),
 
                 // Bottom "Next" Pill Button
-                nextButton
+                new QuizNextButton { Command = viewModel.NextCommand }
+                    .Row(2)
+                    .Bind(IsEnabledProperty, static (TrueFalseQuizViewModel vm) => vm.IsNextEnabled)
             }
         };
-    }
 
     private static Border CreateChoiceCard(
-        TrueFalseQuizViewModel viewModel,
-        string labelText,
-        string glyph,
-        double glyphSize,
-        string commandParameter,
-        string selectedBindingPath)
+     TrueFalseQuizViewModel viewModel,
+     string labelText,
+     string glyph,
+     double glyphSize,
+     bool choiceValue,
+     Expression<Func<TrueFalseQuizViewModel, bool>> isSelectedSelector)
     {
         var iconLabel = new Label
         {
             Text = glyph,
-            TextColor = Color.FromArgb("#64748B"),
             FontSize = glyphSize,
             FontAttributes = FontAttributes.Bold
-        }.Center();
-
-        iconLabel.Triggers.Add(new DataTrigger(typeof(Label))
-        {
-            Binding = new Binding(selectedBindingPath),
-            Value = true,
-            Setters =
-            {
-                new Setter { Property = Label.TextColorProperty, Value = Colors.White }
-            }
-        });
+        }
+        .Center()
+        .Bind<Label, TrueFalseQuizViewModel, bool, Color>(
+            Label.TextColorProperty,
+            getter: isSelectedSelector,
+            convert: static (bool selected) => selected ? Colors.White : Color.FromArgb("#64748B"));
 
         var iconCircle = new Border
         {
-            BackgroundColor = Color.FromArgb("#F1F5F9"),
             StrokeThickness = 0,
             StrokeShape = new RoundRectangle { CornerRadius = 26 },
             Content = iconLabel
-        }.Size(52).CenterHorizontal();
+        }
+        .Size(52)
+        .CenterHorizontal()
+        .Bind<Border, TrueFalseQuizViewModel, bool, Color>(
+            VisualElement.BackgroundColorProperty,
+            getter: isSelectedSelector,
+            convert: static (bool selected) => selected ? Color.FromArgb("#4FA8F6") : Color.FromArgb("#F1F5F9"));
 
-        iconCircle.Triggers.Add(new DataTrigger(typeof(Border))
+        return new Border
         {
-            Binding = new Binding(selectedBindingPath),
-            Value = true,
-            Setters =
-            {
-                new Setter { Property = BackgroundColorProperty, Value = Color.FromArgb("#4FA8F6") }
-            }
-        });
-
-        var card = new Border
-        {
-            BackgroundColor = Colors.White,
-            Stroke = Color.FromArgb("#E2E8F0"),
-            StrokeThickness = 1.5,
             HeightRequest = 170,
             Padding = 16,
             StrokeShape = new RoundRectangle { CornerRadius = 16 },
             GestureRecognizers =
+        {
+            new TapGestureRecognizer
             {
-                new TapGestureRecognizer
-                {
-                    Command = viewModel.SelectAnswerCommand,
-                    CommandParameter = commandParameter
-                }
-            },
+                Command = viewModel.SelectAnswerCommand,
+                CommandParameter = choiceValue
+            }
+        },
             Content = new VerticalStackLayout
             {
                 Spacing = 14,
                 Children =
-                {
-                    iconCircle,
-                    new Label
-                    {
-                        Text = labelText,
-                        TextColor = Color.FromArgb("#2D3748"),
-                        FontSize = 17,
-                        FontAttributes = FontAttributes.Bold
-                    }.CenterHorizontal()
-                }
-            }.Center()
-        };
-
-        card.Triggers.Add(new DataTrigger(typeof(Border))
-        {
-            //Binding = new Binding(selectedBindingPath),
-            //Value = true,
-            Binding = new Binding($"{nameof(TrueFalseQuizViewModel.CurrentItem)}.SelectedAnswer"),
-            Value = labelText == "True", // `true` for True card, `false` for False card
-            Setters =
             {
-                new Setter { Property = Border.StrokeProperty, Value = Color.FromArgb("#4FA8F6") },
-                new Setter { Property = Border.StrokeThicknessProperty, Value = 2.5 },
-                new Setter { Property = BackgroundColorProperty, Value = Color.FromArgb("#EFF6FF") }
+                iconCircle,
+                new Label
+                {
+                    Text = labelText,
+                    TextColor = Color.FromArgb("#2D3748"),
+                    FontSize = 17,
+                    FontAttributes = FontAttributes.Bold
+                }.CenterHorizontal()
             }
-        });
-
-        return card;
+            }.Center()
+        }
+        .Bind<Border, TrueFalseQuizViewModel, bool, Brush>(
+            Border.StrokeProperty,
+            getter: isSelectedSelector,
+            convert: static (bool selected) => selected ? Color.FromArgb("#4FA8F6") : Color.FromArgb("#E2E8F0"))
+        .Bind<Border, TrueFalseQuizViewModel, bool, double>(
+            Border.StrokeThicknessProperty,
+            getter: isSelectedSelector,
+            convert: static (bool selected) => selected ? 2.5 : 1.5)
+        .Bind<Border, TrueFalseQuizViewModel, bool, Color>(
+            VisualElement.BackgroundColorProperty,
+            getter: isSelectedSelector,
+            convert: static (bool selected) => selected ? Color.FromArgb("#EFF6FF") : Colors.White);
     }
 
-    private static AnalyzingOverlayView BuildAnalyzingOverlay() =>
-        new AnalyzingOverlayView()
-            .Bind(IsVisibleProperty, static (TrueFalseQuizViewModel vm) => vm.IsAnalyzing);
-
-    private static QuizSummaryView BuildSummaryView(TrueFalseQuizViewModel viewModel) =>
-       new QuizSummaryView
-       {
-           Title = "True / False Results",
-           RetakeButtonText = "Retake Quiz",
-           RetakeCommand = viewModel.RestartCommand,
-           GoHomeCommand = viewModel.GoHomeCommand,
-           ItemTemplate = new DataTemplate(CreateReviewItemCard)
-       }
-        .Bind(IsVisibleProperty, static (TrueFalseQuizViewModel vm) => vm.IsSummaryVisible)
-        .Bind(QuizSummaryView.SubtitleProperty, static (TrueFalseQuizViewModel vm) => vm.ScoreSummaryText)
-        .Bind(QuizSummaryView.ItemsSourceProperty, static (TrueFalseQuizViewModel vm) => vm.ReviewResults);
-
-    private static Grid CreateReviewItemCard() =>
+    private static View CreateReviewItemCard() =>
         new Grid
         {
             Padding = new Thickness(0, 6),

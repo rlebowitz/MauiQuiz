@@ -6,7 +6,8 @@ namespace MauiQuizChoice.ViewModels;
 public partial class TrueFalseQuizViewModel : QuizViewModelBase<TrueFalseQuestion, TrueFalseReviewItem>
 {
     public TrueFalseQuizViewModel() => InitializeQuiz();
-
+    public override bool IsNextEnabled =>
+      CurrentItem is not null && (CurrentItem.IsTrueSelected || CurrentItem.IsFalseSelected);
     protected override IEnumerable<TrueFalseQuestion> CreateQuizItems()
     {
         return
@@ -33,13 +34,12 @@ public partial class TrueFalseQuizViewModel : QuizViewModelBase<TrueFalseQuestio
             }
         ];
     }
-    public override bool IsNextEnabled =>
-        CurrentItem is not null && (CurrentItem.IsTrueSelected || CurrentItem.IsFalseSelected);
+
 
     [RelayCommand]
-    private void SelectAnswer(string choice)
+    private void SelectAnswer(bool isTrue)
     {
-        bool isTrue = string.Equals(choice, "True", StringComparison.OrdinalIgnoreCase);
+        if (CurrentItem is null) return;
         CurrentItem.IsTrueSelected = isTrue;
         CurrentItem.IsFalseSelected = !isTrue;
 
@@ -56,21 +56,18 @@ public partial class TrueFalseQuizViewModel : QuizViewModelBase<TrueFalseQuestio
             bool userChoice = q.IsTrueSelected;
             bool isCorrect = userChoice == q.CorrectAnswer;
             if (isCorrect) correctCount++;
-            var item = new TrueFalseReviewItem(
+            var x = new TrueFalseReviewItem
+            (
                 q.Statement,
                 userChoice ? "True" : "False",
                 q.CorrectAnswer ? "True" : "False",
                 isCorrect
             );
-            ReviewResults.Add(item);
+            ReviewResults.Add(x);
         }
 
         ScoreSummaryText = $"You scored {correctCount} out of {items.Count}";
     }
 
-    //[RelayCommand]
-    //private static async Task CloseQuiz()
-    //{
-    //    await Shell.Current.GoToAsync("..");
-    //}
+
 }
