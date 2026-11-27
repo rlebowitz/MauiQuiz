@@ -1,5 +1,4 @@
-﻿using AndroidX.AppCompat.Content.Res;
-using MauiQuizChoice.Resources.Strings;
+﻿using MauiQuizChoice.Resources.Strings;
 
 namespace MauiQuizChoice.Models;
 
